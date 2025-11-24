@@ -199,6 +199,15 @@ h1, h2, h3, h4 {
   background: rgba(255,255,255,0.03);
   backdrop-filter: blur(5px);
 }
+.menu-intro {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.8;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
 .menu-columns {
   display: flex;
   justify-content: space-between;
@@ -207,11 +216,41 @@ h1, h2, h3, h4 {
   gap: 4rem;
 }
 .menu-col { flex: 1; }
-.menu-col h4 { color: var(--gold); font-size: 1.5rem; border-bottom: 1px solid #555; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-.menu-col ul { list-style: none; }
-.menu-col li { margin-bottom: 1.5rem; }
-.menu-col strong { display: block; font-size: 1.2rem; font-family: var(--font-head); margin-bottom: 0.2rem; }
-.menu-col span { font-size: 0.9rem; opacity: 0.8; font-style: italic; }
+.menu-col h4 { 
+  color: var(--gold); 
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.menu-col ul { list-style: none; padding: 0; }
+.menu-col li { margin-bottom: 2.5rem; text-align: center; }
+.menu-col strong { 
+  display: block; 
+  font-size: 1.4rem; 
+  color: #fff;
+  font-family: var(--font-head);
+  margin-bottom: 0.5rem; 
+  letter-spacing: 0.5px;
+}
+.menu-col span { 
+  font-size: 1rem; 
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-body);
+  font-style: normal;
+  line-height: 1.6;
+  display: block;
+  max-width: 90%;
+  margin: 0 auto;
+}
+.price-note {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  font-style: italic;
+}
 
 /* --- BOOKING --- */
 .booking-section { padding: 6rem 2rem; background: var(--sand); text-align: center; }
@@ -256,15 +295,32 @@ h1, h2, h3, h4 {
   .menu-content-wrapper { padding: 2rem 1rem; }
   .input-group { flex-direction: column; }
   
-  /* Mobil Meny */
+  /* Mobil Meny FIX */
   .menu-toggle { display: flex; flex-direction: column; gap: 5px; background: none; border: none; z-index: 1001; }
   .bar { width: 30px; height: 3px; background: #fff; }
   .nav-menu {
-    position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
+    position: fixed; 
+    top: 0; 
+    right: -100%; 
+    width: 100%; 
+    height: 100vh;
     background: var(--primary);
-    flex-direction: column; justify-content: center; align-items: center;
+    /* Dessa två rader är nyckeln för kolumn-layouten: */
+    display: flex; /* Säkerställ att den använder flexbox */
+    flex-direction: column; /* Ställ in riktning till kolumn */
+    /* ... och centrering för att alternativen ska ligga snyggt i mitten: */
+    justify-content: center; 
+    align-items: center;
     transition: 0.3s;
   }
   .nav-menu.open { right: 0; }
-  .nav-menu button { font-size: 1.5rem; margin: 1rem 0; }
+  /* Nytt för att ge knapparna full bredd och mer utrymme: */
+  .nav-menu button { 
+    font-size: 1.5rem; 
+    margin: 1rem 0; 
+    width: 80%; /* Gör knappen bredare */
+    padding: 1rem; /* Mer klickarea */
+    text-align: center; /* Centrera texten i knappen */
+    margin-left: 0; /* Ta bort marginalen till vänster som används på desktop */
+  }
 }
