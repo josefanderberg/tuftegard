@@ -128,7 +128,7 @@ function App() {
           <span className="label">Vinter: Nytt Konsept</span>
           <h3>Varme rundt bålpanna</h3>
           <p>
-            **Velkommen til Tufte Gård rundt bålpanna!** Me gleder oss stort til å introdusere vårt nye vinterkonsept.
+          <strong>Velkommen til Tufte Gård rundt bålpanna</strong> Me gleder oss stort til å introdusere vårt nye vinterkonsept.
             Frå romjulen kan du og gjengen booke deires egen bålpanne (min. 4 personer) og nyte ein koselig stund under 
             åpen himmel – med god mat, lune tepper og ekte vinterstemning.
           </p>
