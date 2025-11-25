@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/tuftegard/static/css/main.9e35d593.css",
+    "main.js": "/tuftegard/static/js/main.01871e83.js",
+    "static/js/453.637a6c6d.chunk.js": "/tuftegard/static/js/453.637a6c6d.chunk.js",
+    "index.html": "/tuftegard/index.html",
+    "main.9e35d593.css.map": "/tuftegard/static/css/main.9e35d593.css.map",
+    "main.01871e83.js.map": "/tuftegard/static/js/main.01871e83.js.map",
+    "453.637a6c6d.chunk.js.map": "/tuftegard/static/js/453.637a6c6d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9e35d593.css",
+    "static/js/main.01871e83.js"
+  ]
+}
