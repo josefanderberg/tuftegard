@@ -1,15 +1,31 @@
 {
   "files": {
     "main.css": "/tuftegard/static/css/main.9e35d593.css",
-    "main.js": "/tuftegard/static/js/main.01871e83.js",
+    "main.js": "/tuftegard/static/js/main.1ab34cd7.js",
     "static/js/453.637a6c6d.chunk.js": "/tuftegard/static/js/453.637a6c6d.chunk.js",
+    "static/media/tufte14.png": "/tuftegard/static/media/tufte14.5609e1c90d185f918488.png",
+    "static/media/tufte17.png": "/tuftegard/static/media/tufte17.50c8281e31eecc7f5219.png",
+    "static/media/tufte16.png": "/tuftegard/static/media/tufte16.45fdf9f0cc7542a7f7fc.png",
+    "static/media/tufte15.png": "/tuftegard/static/media/tufte15.52dc254caaa2c7c601cc.png",
+    "static/media/tufte13.png": "/tuftegard/static/media/tufte13.87683b233321ba4df684.png",
+    "static/media/tufte10.png": "/tuftegard/static/media/tufte10.1383e7d0ba90cb70eaec.png",
+    "static/media/tufte12.png": "/tuftegard/static/media/tufte12.ac4c7aedca0cacfe65c0.png",
+    "static/media/tufte8.png": "/tuftegard/static/media/tufte8.3104581146557b0a50d1.png",
+    "static/media/tufte6.png": "/tuftegard/static/media/tufte6.ff94999d196e772ffa5a.png",
+    "static/media/tufte7.png": "/tuftegard/static/media/tufte7.bb6e14eb202611bbb7b6.png",
+    "static/media/tufte3.png": "/tuftegard/static/media/tufte3.e91176248386857c7600.png",
+    "static/media/tufte11.png": "/tuftegard/static/media/tufte11.299f07db1f66e4928957.png",
+    "static/media/tufte9.png": "/tuftegard/static/media/tufte9.27acd0a9379d6a426ed1.png",
+    "static/media/tufte19.png": "/tuftegard/static/media/tufte19.d7357055de16e0c8beb6.png",
+    "static/media/tufte18.png": "/tuftegard/static/media/tufte18.222683a918f43091bbcc.png",
+    "static/media/tufte1.png": "/tuftegard/static/media/tufte1.52edc2f62eb77c978831.png",
     "index.html": "/tuftegard/index.html",
     "main.9e35d593.css.map": "/tuftegard/static/css/main.9e35d593.css.map",
-    "main.01871e83.js.map": "/tuftegard/static/js/main.01871e83.js.map",
+    "main.1ab34cd7.js.map": "/tuftegard/static/js/main.1ab34cd7.js.map",
     "453.637a6c6d.chunk.js.map": "/tuftegard/static/js/453.637a6c6d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9e35d593.css",
-    "static/js/main.01871e83.js"
+    "static/js/main.1ab34cd7.js"
   ]
 }
