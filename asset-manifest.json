@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/tuftegard/static/css/main.9e35d593.css",
-    "main.js": "/tuftegard/static/js/main.1ab34cd7.js",
+    "main.css": "/tuftegard/static/css/main.06d37e72.css",
+    "main.js": "/tuftegard/static/js/main.e8c4fe88.js",
     "static/js/453.637a6c6d.chunk.js": "/tuftegard/static/js/453.637a6c6d.chunk.js",
     "static/media/tufte14.png": "/tuftegard/static/media/tufte14.5609e1c90d185f918488.png",
     "static/media/tufte17.png": "/tuftegard/static/media/tufte17.50c8281e31eecc7f5219.png",
@@ -20,12 +20,12 @@
     "static/media/tufte18.png": "/tuftegard/static/media/tufte18.222683a918f43091bbcc.png",
     "static/media/tufte1.png": "/tuftegard/static/media/tufte1.52edc2f62eb77c978831.png",
     "index.html": "/tuftegard/index.html",
-    "main.9e35d593.css.map": "/tuftegard/static/css/main.9e35d593.css.map",
-    "main.1ab34cd7.js.map": "/tuftegard/static/js/main.1ab34cd7.js.map",
+    "main.06d37e72.css.map": "/tuftegard/static/css/main.06d37e72.css.map",
+    "main.e8c4fe88.js.map": "/tuftegard/static/js/main.e8c4fe88.js.map",
     "453.637a6c6d.chunk.js.map": "/tuftegard/static/js/453.637a6c6d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9e35d593.css",
-    "static/js/main.1ab34cd7.js"
+    "static/css/main.06d37e72.css",
+    "static/js/main.e8c4fe88.js"
   ]
 }
