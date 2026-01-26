@@ -1,326 +1,690 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600&display=swap');
-
+/* --- VARIABLER & GLOBAL --- */
 :root {
-  --primary: #2F3E46; /* Dyp mørkegrønn/skifer */
-  --accent: #A63C3C; /* Rustrød/Morell */
-  --sand: #F4F1EA;   /* Varm hvit */
-  --gold: #C5A065;   /* Antikk gull */
-  --text: #1a1a1a;
-  
-  --font-head: 'Cormorant Garamond', serif;
-  --font-body: 'Montserrat', sans-serif;
+  --primary-dark: #1a1a1a;
+  --secondary-dark: #2c2c2c;
+  --gold: #c5a059;
+  --gold-hover: #e6b86a;
+  --light: #f4f4f4;
+  --text-dark: #333;
+  --text-light: #f9f9f9;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Lato', sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  background-color: var(--sand);
-  color: var(--text);
-  font-family: var(--font-body);
-  line-height: 1.7;
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  line-height: 1.6;
+  background-color: var(--light);
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-head);
-  font-weight: 600;
-  color: var(--primary);
-  line-height: 1.2;
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-serif);
 }
 
 /* --- HEADER --- */
 .header {
   position: fixed;
-  width: 100%;
   top: 0;
+  width: 100%;
+  background-color: transparent;
+  padding: 20px 0;
   z-index: 1000;
-  padding: 1.5rem 2rem;
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
+
 .header.scrolled {
-  background: rgba(47, 62, 70, 0.95);
-  padding: 0.8rem 2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: rgba(26, 26, 26, 0.95);
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .header-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+
   align-items: center;
+  padding: 0 20px;
 }
 
 .logo {
-  font-size: 2rem;
-  color: #fff;
+  color: var(--light);
+  font-size: 1.8rem;
+  letter-spacing: 2px;
   cursor: pointer;
-  letter-spacing: 1px;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
 }
 
 .nav-menu button {
-  background: transparent;
+  background: none;
   border: none;
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+  color: var(--light);
+  font-size: 1rem;
   text-transform: uppercase;
-  margin-left: 2rem;
   letter-spacing: 1px;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: 0.3s;
+  transition: color 0.3s;
 }
-.nav-menu button:hover { opacity: 1; color: var(--gold); }
+
+.nav-menu button:hover {
+  color: var(--gold);
+}
 
 .btn-book {
   border: 1px solid var(--gold) !important;
-  padding: 0.5rem 1.5rem;
-  color: var(--gold) !important;
+  padding: 8px 20px;
+  border-radius: 2px;
 }
-.btn-book:hover { background: var(--gold); color: #000 !important; }
+
+.btn-book:hover {
+  background-color: var(--gold) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* --- MOBILE MENU --- */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  gap: 5px;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: var(--light);
+  transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: var(--primary-dark);
+    flex-direction: column;
+
+    /* ÄNDRING 1: Sätt padding till 0 här */
+    padding: 0;
+
+    gap: 20px;
+    text-align: center;
+    max-height: 0;
+    overflow: hidden;
+
+    /* ÄNDRING 2: Lägg till padding i transition för mjuk animation */
+    transition: max-height 0.4s ease, padding 0.4s ease;
+  }
+
+  .nav-menu.open {
+    max-height: 400px;
+
+    /* ÄNDRING 3: Lägg tillbaka paddingen här när den öppnas */
+    padding: 20px;
+  }
+}
+
+/* --- NY HERO FIXED BACKGROUND (PARALLAX FIX) --- */
+.hero-bg-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  /* Måste vara bakom allt innehåll */
+  will-change: transform;
+  /* För mjukare mobilanimering */
+}
 
 /* --- HERO --- */
 .hero {
-  height: 90vh;
-  /* Bilden sätts nu i App.js för att undvika fel */
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  
+  height: 100dvh;
+  /* Modern standard som hanterar mobila adressfält bättre */
+  /* VIKTIGT: Tar bort bakgrundsstilar härifrån och gör bakgrunden transparent */
+  background: transparent;
+  background-attachment: scroll;
+  /* Sätter till scroll för att rensa eventuella problem */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #fff;
+  color: var(--light);
+  padding: 0 20px;
+  position: relative;
+  /* Sätter z-index 0, så content syns över fixed background */
 }
-.hero-content { max-width: 800px; padding: 2rem; }
-.subtitle { font-family: var(--font-body); text-transform: uppercase; letter-spacing: 4px; font-size: 0.9rem; display: block; margin-bottom: 1rem; }
-.hero h2 { font-size: 4.5rem; color: #fff; margin-bottom: 1.5rem; font-style: italic; }
-.hero p { font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+.hero-content {
+  max-width: 800px;
+  animation: fadeIn 1.5s ease;
+}
+
+.subtitle {
+  display: block;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  color: var(--gold);
+}
+
+.hero h2 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
+  background-color: var(--gold);
+  color: var(--primary-dark);
   border: none;
-  padding: 1rem 2.5rem;
+  padding: 15px 40px;
   font-size: 1rem;
+  text-transform: uppercase;
   letter-spacing: 1px;
-  cursor: pointer;
   transition: 0.3s;
 }
-.btn-primary:hover { background: #8a2f2f; transform: translateY(-3px); }
 
-/* --- INTRO --- */
-.section-container { max-width: 900px; margin: 6rem auto; padding: 0 2rem; }
-.text-center { text-align: center; }
-.label { color: var(--accent); text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; font-weight: 700; }
-.intro-text h3 { font-size: 3rem; margin: 1rem 0; }
-.divider { font-size: 2rem; color: var(--gold); margin: 1rem 0 2rem; }
-.lead { font-size: 1.3rem; color: #444; margin-bottom: 1.5rem; }
+.btn-primary:hover {
+  background-color: var(--gold-hover);
+  transform: translateY(-2px);
+}
 
-/* --- SPLIT SECTIONS (Sommar/Vinter) --- */
+/* --- SECTIONS COMMON & Z-INDEX FIX --- */
+/* Ger alla sektioner en solid bakgrund och z-index för att täcka den fasta Hero-bilden */
+.section-container,
+.split-section,
+.gallery-section,
+.booking-section,
+.footer {
+  position: relative;
+  z-index: 1;
+  /* Följande är viktiga för att täcka den fixed-bilden: */
+  background-color: var(--light);
+}
+
+.section-container {
+  padding: 80px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ... (resten av .section-container stilarna) */
+
+
+.text-center {
+  text-align: center;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.divider {
+  color: var(--gold);
+  font-size: 2rem;
+  margin: 20px 0;
+}
+
+.lead {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* --- REVEAL ANIMATION --- */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- SPLIT SECTION (Bilde + Text) --- */
 .split-section {
   display: flex;
-  height: 700px;
-  width: 100%;
-  overflow: hidden;
+  flex-wrap: wrap;
 }
-.split-section.reverse { flex-direction: row-reverse; }
+
+.split-section.reverse {
+  flex-direction: row-reverse;
+}
+
+.split-image,
+.split-content {
+  flex: 1;
+  min-width: 300px;
+}
 
 .split-image {
-  flex: 1;
   background-size: cover;
   background-position: center;
   min-height: 400px;
 }
 
 .split-content {
-  flex: 1;
-  padding: 5rem;
+  padding: 60px 40px;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #fff;
 }
-.split-content h3 { font-size: 2.5rem; margin-bottom: 1.5rem; }
-.split-content p { font-size: 1.1rem; color: #555; margin-bottom: 1rem; max-width: 500px; }
 
-/* --- MASONRY GALLERY --- */
-.gallery-section { padding: 6rem 2rem; background: #fff; }
-.section-header { text-align: center; margin-bottom: 3rem; }
-.section-header h3 { font-size: 3rem; }
+.split-content h3 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+/* --- GALLERI --- */
+.gallery-section {
+  padding: 80px 20px;
+  /* Lade till bakgrundsfärg här för att täcka fixed-bilden */
+  background-color: var(--light);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h3 {
+  font-size: 2.5rem;
+}
 
 .masonry-grid {
-  column-count: 3;
-  column-gap: 1.5rem;
-  max-width: 1400px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  max-width: 1200px;
   margin: 0 auto;
 }
-.masonry-item {
-  margin-bottom: 1.5rem;
-  position: relative;
-  overflow: hidden;
-  break-inside: avoid;
-}
+
 .masonry-item img {
   width: 100%;
-  display: block;
+  height: 300px;
+  object-fit: cover;
   border-radius: 2px;
-  transition: transform 0.6s ease;
+  transition: transform 0.3s;
 }
-.masonry-item:hover img { transform: scale(1.05); }
 
-/* --- MENY --- */
+.masonry-item img:hover {
+  transform: scale(1.02);
+}
+
+/* NYTT: Galleri Knapp */
+.gallery-button-container {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--gold);
+  color: var(--text-dark);
+  padding: 12px 35px;
+  font-size: 1rem;
+  font-family: var(--font-serif);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-outline:hover {
+  background-color: var(--gold);
+  color: var(--light);
+}
+
+
+/* --- MENU SECTION (Dark) --- */
 .menu-section {
   position: relative;
-  /* Bilden sätts nu i App.js för att undvika fel */
+  /* OBS! Behåller background-attachment: fixed här (för att behålla effekten där det fungerar). 
+     Om denna sektion också zoomar på mobil måste du applicera samma "fixed div"-lösning för den också. */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  background-repeat: no-repeat;
-  
-  padding: 6rem 2rem;
-  color: #fff;
+  color: var(--light);
+  padding: 100px 20px;
+  z-index: 1;
+  /* Säkerställer att den täcker Hero-bakgrunden */
+  background-color: var(--primary-dark);
+  /* Ger en solid mörk basfärg */
 }
+
 .menu-overlay {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(30, 30, 30, 0.8);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
 }
+
 .menu-content-wrapper {
   position: relative;
   z-index: 2;
   max-width: 1000px;
   margin: 0 auto;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 4rem;
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(5px);
 }
+
+.yellowh3 {
+  font-size: 2.5rem;
+  color: var(--gold);
+  margin-bottom: 30px;
+}
+
 .menu-intro {
-  font-size: 1.2rem;
+  margin-bottom: 50px;
+  font-size: 1.1rem;
   max-width: 700px;
-  margin: 0 auto 3rem auto;
-  line-height: 1.8;
-  font-weight: 400;
-  opacity: 0.9;
 }
 
 .menu-columns {
   display: flex;
-  justify-content: space-between;
-  margin-top: 3rem;
-  text-align: left;
-  gap: 4rem;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 50px;
 }
-.menu-col { flex: 1; }
-.menu-col h4 { 
-  color: var(--gold); 
-  font-family: var(--font-head);
-  font-size: 1.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  padding-bottom: 1rem;
-  margin-bottom: 2rem;
+
+.menu-col {
+  flex: 1;
+  min-width: 300px;
+}
+
+.menu-col h4 {
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: var(--gold);
+}
+
+.menu-col ul {
+  list-style: none;
+}
+
+.menu-col li {
+  margin-bottom: 25px;
+}
+
+.menu-col strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.menu-col span {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.price-note,
+.menu-times {
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* --- BOOKING SECTION --- */
+.booking-section {
+  padding: 80px 20px;
+  background-color: #fff;
+}
+
+.booking-container {
+  max-width: 800px;
+  margin: 0 auto;
   text-align: center;
 }
-.menu-col ul { list-style: none; padding: 0; }
-.menu-col li { margin-bottom: 2.5rem; text-align: center; }
-.menu-col strong { 
-  display: block; 
-  font-size: 1.4rem; 
-  color: #fff;
-  font-family: var(--font-head);
-  margin-bottom: 0.5rem; 
-  letter-spacing: 0.5px;
-}
-.menu-col span { 
-  font-size: 1rem; 
-  color: rgba(255, 255, 255, 0.85);
-  font-family: var(--font-body);
-  font-style: normal;
-  line-height: 1.6;
-  display: block;
-  max-width: 90%;
-  margin: 0 auto;
-}
-.price-note {
-  margin-top: 3rem;
-  font-size: 0.9rem;
-  opacity: 0.6;
-  font-style: italic;
+
+.booking-form {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Ta bort overflow:hidden eller max-width om det finns, för att kalendern ska få plats */
 }
 
-/* --- BOOKING --- */
-.booking-section { padding: 6rem 2rem; background: var(--sand); text-align: center; }
-.booking-container { max-width: 700px; margin: 0 auto; }
-.booking-form { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
-.input-group { display: flex; gap: 1rem; }
-.booking-form input, .booking-form select, .booking-form textarea {
+/* 
+   STOR UPPDATERING AV GRID SYSTEMET FÖR FORMULÄRET 
+   Vi använder CSS Grid istället för Flex för överlägsen kontroll över bredder.
+*/
+.input-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* 50% / 50% */
+  gap: 20px;
   width: 100%;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  background: #fff;
-  font-family: var(--font-body);
+}
+
+.input-full-width {
+  grid-column: 1 / -1;
+  /* Spänner över båda kolumnerna = 100% bredd */
+}
+
+/* STYLING FÖR INPUTS OCH SELECTS */
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+  width: 100%;
+  /* Alltid fyll sin container */
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  line-height: normal;
+  appearance: none;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 52px;
   font-size: 1rem;
 }
-.booking-form button {
-  padding: 1.2rem;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.3s;
+
+.booking-form textarea {
+  height: auto;
+  min-height: 120px;
 }
-.booking-form button:hover { background: #1a2429; }
+
+/* ENDAST SELECT SKA HA PILEN */
+.booking-form select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4L146.2%20208.7L5.4%2069.4h281.6z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 0.8em;
+  padding-right: 30px;
+}
+
+/* FIX: DatePicker wrapper måste vara 100% av sin grid cell */
+.react-datepicker-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  display: block;
+  width: 100%;
+}
+
+/* FIX 4: Fixar datum/tid-fälten på mobil */
+@media (hover: none) and (pointer: coarse) {
+
+  input[type="date"],
+  input[type="time"] {
+    color: #333;
+  }
+}
+
+.booking-form button {
+  background-color: var(--primary-dark);
+  color: var(--gold);
+  padding: 15px;
+  border: none;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  transition: 0.3s;
+  width: 100%;
+  /* Knapp alltid full bredd */
+}
+
+.booking-form button:hover {
+  background-color: var(--gold);
+  color: var(--primary-dark);
+}
+
+.booking-info {
+  margin-top: 30px;
+  font-size: 0.9rem;
+  color: #777;
+}
 
 /* --- FOOTER --- */
-.footer { background: #1a1a1a; color: #888; text-align: center; padding: 2rem; font-size: 0.9rem; }
+.footer {
+  background-color: var(--primary-dark);
+  color: #777;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 0.9rem;
+  z-index: 1;
+}
 
-/* --- ANIMATION --- */
-.reveal-section { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
-.reveal-section.is-visible { opacity: 1; transform: translateY(0); }
+/* --- RESPONSIVE FIXES --- */
+@media (max-width: 600px) {
+  .hero h2 {
+    font-size: 2.5rem;
+  }
 
-/* --- RESPONSIVT --- */
-@media (max-width: 768px) {
-  .hero h2 { font-size: 3rem; }
-  .split-section { flex-direction: column !important; height: auto; }
-  .split-image { height: 300px; }
-  .split-content { padding: 3rem 1.5rem; }
-  .masonry-grid { column-count: 1; }
-  .menu-columns { flex-direction: column; gap: 2rem; }
-  .menu-content-wrapper { padding: 2rem 1rem; }
-  .input-group { flex-direction: column; }
-  
-  /* Mobil Meny FIX */
-  .menu-toggle { display: flex; flex-direction: column; gap: 5px; background: none; border: none; z-index: 1001; }
-  .bar { width: 30px; height: 3px; background: #fff; }
-  .nav-menu {
-    position: fixed; 
-    top: 0; 
-    right: -100%; 
-    width: 100%; 
-    height: 100vh;
-    background: var(--primary);
-    /* Dessa två rader är nyckeln för kolumn-layouten: */
-    display: flex; /* Säkerställ att den använder flexbox */
-    flex-direction: column; /* Ställ in riktning till kolumn */
-    /* ... och centrering för att alternativen ska ligga snyggt i mitten: */
-    justify-content: center; 
-    align-items: center;
-    transition: 0.3s;
+  /* MOBIL: Byt till 1 kolumn så allt staplas snyggt */
+  .input-grid-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
-  .nav-menu.open { right: 0; }
-  /* Nytt för att ge knapparna full bredd och mer utrymme: */
-  .nav-menu button { 
-    font-size: 1.5rem; 
-    margin: 1rem 0; 
-    width: 80%; /* Gör knappen bredare */
-    padding: 1rem; /* Mer klickarea */
-    text-align: center; /* Centrera texten i knappen */
-    margin-left: 0; /* Ta bort marginalen till vänster som används på desktop */
-  }
+}
+
+/* --- React DatePicker Custom Styles --- */
+/* FIX: Se till att popup-kalendern får plats */
+.react-datepicker-popper {
+  z-index: 9999 !important;
+  /* Alltid över allt annat */
+  /* width: max-content; */
+}
+
+.react-datepicker {
+  font-family: var(--font-sans) !important;
+  border-color: #ddd !important;
+  border-radius: 4px !important;
+  /* Låt kalendern ta plats men inte mer än skärmen */
+  max-width: 90vw;
+  display: flex !important;
+  justify-content: center;
+}
+
+.react-datepicker__month-container {
+  width: 100%;
+}
+
+.react-datepicker__header {
+  background-color: var(--primary-dark) !important;
+  color: #fff !important;
+  border-bottom: none !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: var(--gold) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--gold) !important;
+  color: #000 !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--gold-hover) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+}
+
+/* Custom width for datepicker input to match other inputs */
+.custom-datepicker-input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd !important;
+  border-radius: 2px !important;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  outline: none;
+  background: transparent;
+  color: #333;
+  display: block;
+  box-sizing: border-box;
+  height: 52px;
+}
+
+
+.react-datepicker__day--disabled {
+  color: #ccc !important;
+  opacity: 0.5;
+}
+
+.calendar-open-day {
+  background-color: #e6f9e6 !important;
+  color: #2e7d32 !important;
+  font-weight: bold !important;
+  border: 1px solid #4caf50 !important;
+  border-radius: 50%;
+}
+
+.calendar-open-day:hover {
+  background-color: #c8e6c9 !important;
 }
