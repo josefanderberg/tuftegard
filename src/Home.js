@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './App.css';
+import { db } from './firebase';
+import { collection, addDoc, getDocs, query } from 'firebase/firestore';
 
 // --- ANIMATION KOMPONENT ---
 const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
@@ -33,17 +35,88 @@ const Home = ({ content }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [visibleImagesCount, setVisibleImagesCount] = useState(6);
+
+    // --- BOKNING STATE ---
     const [bookingDate, setBookingDate] = useState(null);
+    const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+
+    // Lista på datum som är fulla (>= 5 bokningar)
+    const [fullyBookedDates, setFullyBookedDates] = useState([]);
+
+    // Formulär-data
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        guests: 1,
+        time: '',
+        notes: '',
+        dishes: {}
+    });
+
+    const [submitting, setSubmitting] = useState(false);
 
     // Konvertera sträng-datum från content till Date-objekt
     const openDates = (content.calendar?.openDates || []).map(d => new Date(d));
-    const timeSlots = content.booking?.timeSlots || ["18:00"];
 
+    // Menyalternativ för mat
+    const mainCourses = content.menu.mainCourses || [];
+    const drinksGroups = content.menu.drinksGroups || [];
+
+    const MAX_BOOKINGS = 5;
+
+    // --- EFFEKTER ---
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
+
+        // HÄMTA FULLBOKADE DATUM PÅ LOAD
+        fetchBookingsAndCheckCapacity();
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const fetchBookingsAndCheckCapacity = async () => {
+        if (!db) return;
+        try {
+            const q = query(collection(db, "bookings"));
+            const snapshot = await getDocs(q);
+            const counts = {};
+            snapshot.forEach(doc => {
+                const d = doc.data().date;
+                if (d) counts[d] = (counts[d] || 0) + 1;
+            });
+
+            // Hitta datum som nått gränsen
+            const fullDates = Object.keys(counts).filter(date => counts[date] >= MAX_BOOKINGS);
+            setFullyBookedDates(fullDates);
+        } catch (error) {
+            console.error("Fel vid hämtning av kapacitet", error);
+        }
+    };
+
+    // Uppdatera tillgängliga tider när datum ändras
+    useEffect(() => {
+        if (!bookingDate) {
+            setAvailableTimeSlots([]);
+            return;
+        }
+
+        const day = bookingDate.getDay(); // 0 = Söndag
+        let slots = [];
+        const standardTimes = content.booking?.standardTimes || ["18:00"];
+        const sundayTimes = content.booking?.sundayTimes || ["15:00"];
+
+        if (day === 0) {
+            slots = sundayTimes;
+        } else {
+            slots = standardTimes;
+        }
+        setAvailableTimeSlots(slots);
+
+        if (slots.length > 0) {
+            setFormData(prev => ({ ...prev, time: slots[0] }));
+        }
+    }, [bookingDate, content.booking]);
 
     const scrollToSection = (id) => {
         setMenuOpen(false);
@@ -55,10 +128,7 @@ const Home = ({ content }) => {
             const elementPosition = elementRect - bodyRect;
             const offsetPosition = elementPosition - offset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         }
     };
 
@@ -72,18 +142,63 @@ const Home = ({ content }) => {
         setVisibleImagesCount(galleryImages.length);
     };
 
-    const mainCourses = content.menu.mainCourses || [];
-    const drinksGroups = content.menu.drinksGroups || [];
+    const handleDishCountChange = (dishTitle, count) => {
+        setFormData(prev => ({
+            ...prev,
+            dishes: {
+                ...prev.dishes,
+                [dishTitle]: parseInt(count)
+            }
+        }));
+    };
+
+    const handleSubmitBooking = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+
+        if (!bookingDate) {
+            alert("Vennligst velg en dato.");
+            setSubmitting(false);
+            return;
+        }
+
+        const offset = bookingDate.getTimezoneOffset();
+        const localDate = new Date(bookingDate.getTime() - (offset * 60 * 1000));
+        const dateString = localDate.toISOString().split('T')[0];
+
+        // Dubbelkolla mot fullyBookedDates (klient-side check)
+        if (fullyBookedDates.includes(dateString)) {
+            alert("Tyvärr, detta datum har precis blivit fullbokat.");
+            setSubmitting(false);
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "bookings"), {
+                ...formData,
+                date: dateString,
+                createdAt: new Date().toISOString()
+            });
+
+            alert(`Takk! Di bordbestilling for ${formData.guests} personar den ${dateString} kl ${formData.time} er mottatt.`);
+
+            setBookingDate(null);
+            setFormData({ name: '', email: '', guests: 1, time: '', notes: '', dishes: {} });
+
+            // Uppdatera kapacitet direkt ifall man vill boka igen
+            fetchBookingsAndCheckCapacity();
+        } catch (error) {
+            console.error(error);
+            alert("Noe gikk galt.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <div className="App">
+            <div className="hero-bg-fixed" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('/tufte1.png')" }}></div>
 
-            <div
-                className="hero-bg-fixed"
-                style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('/tufte1.png')" }}
-            ></div>
-
-            {/* --- HEADER --- */}
             <header className={`header ${scrolled ? 'scrolled' : ''}`}>
                 <div className="header-container">
                     <h1 className="logo" onClick={() => scrollToSection('hjem')}>Tufte Gård</h1>
@@ -99,7 +214,6 @@ const Home = ({ content }) => {
                 </div>
             </header>
 
-            {/* --- HERO --- */}
             <section id="hjem" className="hero">
                 <div className="hero-content">
                     <span className="subtitle">{content.hero.subtitle}</span>
@@ -109,7 +223,6 @@ const Home = ({ content }) => {
                 </div>
             </section>
 
-            {/* --- INTRO --- */}
             <RevealOnScroll className="section-container text-center intro-text">
                 <span className="label">{content.intro.label}</span>
                 <h3>{content.intro.title}</h3>
@@ -118,7 +231,6 @@ const Home = ({ content }) => {
                 <p>{content.intro.text}</p>
             </RevealOnScroll>
 
-            {/* --- SESONG --- */}
             <RevealOnScroll id="stemning" className="split-section reverse">
                 <div className="split-image" style={{ backgroundImage: "url('/tufte3.png')" }}></div>
                 <div className="split-content">
@@ -129,7 +241,6 @@ const Home = ({ content }) => {
                 </div>
             </RevealOnScroll>
 
-            {/* --- GALLERI --- */}
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
                     <h3>{content.gallery.title}</h3>
@@ -151,19 +262,12 @@ const Home = ({ content }) => {
                 )}
             </section>
 
-            {/* --- MENY --- */}
-            <RevealOnScroll
-                id="meny"
-                className="menu-section"
-                style={{ backgroundImage: "url('/tufte3.png')" }}
-            >
+            <RevealOnScroll id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte3.png')" }}>
                 <div className="menu-overlay"></div>
                 <div className="menu-content-wrapper">
                     <span className="label" style={{ color: 'var(--gold)' }}>{content.menu.label}</span>
                     <h3 className="yellowh3">{content.menu.title}</h3>
-
                     <p className="menu-intro">{content.menu.intro}</p>
-
                     <div className="menu-columns">
                         <div className="menu-col">
                             <h4>Hovudrettar</h4>
@@ -196,7 +300,6 @@ const Home = ({ content }) => {
                             </ul>
                         </div>
                     </div>
-
                     <p className="price-note">
                         <em><strong>{content.menu.priceNotePrefix}</strong> {content.menu.priceNote.replace(content.menu.priceNotePrefix, '')}</em>
                     </p>
@@ -208,62 +311,61 @@ const Home = ({ content }) => {
                 </div>
             </RevealOnScroll>
 
-            {/* --- BESTILLING --- */}
             <RevealOnScroll id="kontakt" className="booking-section">
                 <div className="booking-container">
                     <h3>{content.booking.title}</h3>
                     <p>{content.booking.subtitle}</p>
 
-                    <form className="booking-form" onSubmit={(e) => { e.preventDefault(); alert("Takk! Me tek kontakt snart."); }}>
-                        {/* RAD 1: NAMN & EPOST */}
+                    <form className="booking-form" onSubmit={handleSubmitBooking}>
                         <div className="input-grid-row">
-                            <input type="text" placeholder="Ditt namn" required />
-                            <input type="email" placeholder="E-post" required />
+                            <input type="text" placeholder="Ditt namn" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                            <input type="email" placeholder="E-post" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                         </div>
 
-                        {/* RAD 2: MAT & ANTAL */}
                         <div className="input-grid-row">
-                            <select defaultValue="Middag">
-                                <option>Grillplanke (399 kr)</option>
-                                <option>Chili con Carne (329 kr)</option>
-                                <option>Smaking / Event</option>
-                            </select>
-                            <input type="number" placeholder="Antall pers (Min. 4 for bålpanne)" min="1" required />
-                        </div>
-
-                        {/* RAD 3: DATUM & TID */}
-                        <div className="input-grid-row">
-                            <DatePicker
-                                className="custom-datepicker-input"
-                                selected={bookingDate}
-                                onChange={(date) => setBookingDate(date)}
-                                includeDates={openDates}
-                                placeholderText="Velg tilgjengelig dato"
-                                dateFormat="yyyy-MM-dd"
-                                required
-                                wrapperClassName="react-datepicker-wrapper-custom"
-                            />
-                            {/* BYTT UT TEXT-INPUT MOT SELECT */}
-                            <select required>
-                                <option value="" disabled selected>Välj tid...</option>
-                                {timeSlots.map((slot, index) => (
+                            <input type="number" placeholder="Antall pers" min="1" required value={formData.guests} onChange={e => setFormData({ ...formData, guests: e.target.value })} />
+                            <select required value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} disabled={!bookingDate}>
+                                <option value="" disabled>Velg tid...</option>
+                                {availableTimeSlots.map((slot, index) => (
                                     <option key={index} value={slot}>{slot}</option>
                                 ))}
                             </select>
                         </div>
 
-                        <textarea placeholder="Har de spesielle ønskjer, allergiar eller vil du reservere For de minste-alternativet?"></textarea>
-                        <button type="submit">Send Førespurnad</button>
+                        <div className="input-grid-row" style={{ gridTemplateColumns: '1fr' }}>
+                            <DatePicker
+                                className="custom-datepicker-input"
+                                selected={bookingDate}
+                                onChange={(date) => setBookingDate(date)}
+                                includeDates={openDates}
+                                // EXCLUDE FULLA DATUM
+                                excludeDates={fullyBookedDates.map(d => new Date(d))}
+                                placeholderText="Velg tilgjengelig dato"
+                                dateFormat="yyyy-MM-dd"
+                                required
+                                wrapperClassName="react-datepicker-wrapper-custom"
+                            />
+                        </div>
+
+                        <div style={{ margin: '30px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', padding: '20px 0', textAlign: 'left' }}>
+                            <h4 style={{ marginBottom: '15px', color: '#c5a059', textAlign: 'center' }}>Velg Menyer</h4>
+                            <p style={{ fontSize: '0.9rem', color: '#777', marginBottom: '20px', textAlign: 'center' }}>Vennligst oppgi antall på hver rett som ønskes servert til selskapet.</p>
+                            {mainCourses.map((dish, index) => (
+                                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                    <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>{dish.title}</label>
+                                    <input type="number" min="0" placeholder="0" style={{ width: '80px', height: '40px', padding: '5px', textAlign: 'center' }} onChange={(e) => handleDishCountChange(dish.title, e.target.value)} />
+                                </div>
+                            ))}
+                        </div>
+
+                        <textarea placeholder="Har de spesielle ønskjer, allergiar eller vil du reservere For de minste-alternativet?" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
+
+                        <button type="submit" disabled={submitting}>{submitting ? "Sender..." : "Send Førespurnad"}</button>
                     </form>
-                    <p className="booking-info">
-                        {content.booking.contactInfo}
-                    </p>
+                    <p className="booking-info">{content.booking.contactInfo}</p>
                 </div>
             </RevealOnScroll>
-
-            <footer className="footer">
-                <p>{content.footer.text}</p>
-            </footer>
+            <footer className="footer"><p>{content.footer.text}</p></footer>
         </div>
     );
 };

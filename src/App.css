@@ -688,3 +688,15 @@ button {
 .calendar-open-day:hover {
   background-color: #c8e6c9 !important;
 }
+
+.react-datepicker__day--highlighted-custom-1 {
+  background-color: #4caf50 !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+.react-datepicker__day--highlighted-custom-2 {
+  background-color: #ff4444 !important;
+  color: white !important;
+  border-radius: 50%;
+}
