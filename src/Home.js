@@ -4,6 +4,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import './App.css';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, query } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
+
+import { defaultContent } from './defaultContent';
 
 // --- ANIMATION KOMPONENT ---
 const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
@@ -31,7 +34,18 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     );
 };
 
-const Home = ({ content }) => {
+const Home = ({ content: propContent }) => {
+    // Merge propContent with defaultContent to ensure new keys exist
+    // This is a simple deep merge for specific sections we know changed
+    const content = {
+        ...propContent,
+        intro: {
+            ...defaultContent.intro,
+            ...propContent.intro
+        }
+    };
+
+    // ... (rest of component)
     const [menuOpen, setMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [visibleImagesCount, setVisibleImagesCount] = useState(6);
@@ -152,6 +166,9 @@ const Home = ({ content }) => {
         }));
     };
 
+    // --- POPUP STATE ---
+    const [showConfirmation, setShowConfirmation] = useState(false);
+
     const handleSubmitBooking = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -180,10 +197,37 @@ const Home = ({ content }) => {
                 createdAt: new Date().toISOString()
             });
 
-            alert(`Takk! Di bordbestilling for ${formData.guests} personar den ${dateString} kl ${formData.time} er mottatt.`);
+            // --- SEND EMAIL MED EMAILJS ---
+            const dishesList = Object.entries(formData.dishes)
+                .filter(([_, count]) => count > 0)
+                .map(([dish, count]) => `${dish}: ${count} st`)
+                .join('\n');
 
-            setBookingDate(null);
-            setFormData({ name: '', phone: '', guests: 4, time: '', notes: '', dishes: {} });
+            const emailParams = {
+                to_email: 'forstafordelsedagen@gmail.com',
+                from_name: formData.name,
+                from_phone: formData.phone,
+                guests: formData.guests,
+                date: dateString,
+                time: formData.time,
+                message: formData.notes,
+                dishes: dishesList || "Inga specifika rätter valda"
+            };
+
+            emailjs.send(
+                'service_tz8pcfs',
+                'template_hsco7dh',
+                emailParams,
+                'vehh17hnHhpaEkp8M'
+            ).then((response) => {
+                console.log('SUCCESS!', response.status, response.text);
+            }, (err) => {
+                console.log('FAILED...', err);
+            });
+            // -----------------------------
+
+            // VISA BEKRÄFTELSE POPUP
+            setShowConfirmation(true);
 
             // Uppdatera kapacitet direkt ifall man vill boka igen
             fetchBookingsAndCheckCapacity();
@@ -193,6 +237,12 @@ const Home = ({ content }) => {
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const closeConfirmation = () => {
+        setShowConfirmation(false);
+        setBookingDate(null);
+        setFormData({ name: '', phone: '', guests: 4, time: '', notes: '', dishes: {} });
     };
 
     return (
@@ -223,13 +273,22 @@ const Home = ({ content }) => {
                 </div>
             </section>
 
-            <RevealOnScroll className="section-container text-center intro-text">
+            <section className="section-container text-center intro-text">
                 <span className="label">{content.intro.label}</span>
                 <h3>{content.intro.title}</h3>
                 <div className="divider">❦</div>
-                <p className="lead">{content.intro.lead}</p>
-                <p>{content.intro.text}</p>
-            </RevealOnScroll>
+
+                <div className="intro-split">
+                    <RevealOnScroll className="intro-col slide-left">
+                        <h4>{content.intro.gardenTitle}</h4>
+                        <p>{content.intro.gardenText}</p>
+                    </RevealOnScroll>
+                    <RevealOnScroll className="intro-col slide-right">
+                        <h4>{content.intro.foodTitle}</h4>
+                        <p>{content.intro.foodText}</p>
+                    </RevealOnScroll>
+                </div>
+            </section>
 
             <RevealOnScroll id="stemning" className="split-section reverse">
                 <div className="split-image" style={{ backgroundImage: "url('/tufte3.png')" }}></div>
@@ -382,6 +441,16 @@ const Home = ({ content }) => {
                     <p>{content.footer.text}</p>
                 </div>
             </footer>
+            {showConfirmation && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <h3>Takk for di bestilling!</h3>
+                        <p>Me har mottatt di førespurnad og vil sjå over den.</p>
+                        <p>Du vil høyre frå oss på SMS så snart me har bekrefta bordet.</p>
+                        <button className="btn-primary" onClick={closeConfirmation}>Lukk</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

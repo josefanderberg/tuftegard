@@ -288,6 +288,20 @@ button {
   transform: translateY(0);
 }
 
+/* --- SIDE SLIDE EFFECT --- */
+.reveal-section.slide-left {
+  transform: translateX(-100px);
+}
+
+.reveal-section.slide-right {
+  transform: translateX(100px);
+}
+
+.reveal-section.slide-left.is-visible,
+.reveal-section.slide-right.is-visible {
+  transform: translateX(0);
+}
+
 /* --- SPLIT SECTION (Bilde + Text) --- */
 .split-section {
   display: flex;
@@ -732,4 +746,99 @@ button {
   width: 28px;
   height: 28px;
   fill: currentColor;
+}
+
+/* --- INTRO SPLIT --- */
+.intro-split {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 40px;
+  /* Removed overflow: hidden to allow slide animation from outside */
+}
+
+.intro-col {
+  flex: 1;
+  min-width: 300px;
+  text-align: left;
+  padding: 20px;
+}
+
+.intro-col h4 {
+  color: var(--gold);
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.intro-col p {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .intro-split {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .intro-col {
+    text-align: center;
+  }
+}
+/* Ensure body doesn't scroll horizontally due to transforms */
+body {
+    overflow-x: hidden;
+}
+
+/* --- POPUP MODAL --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  animation: slideUp 0.4s ease;
+}
+
+.popup-content h3 {
+  color: var(--gold);
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.popup-content p {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

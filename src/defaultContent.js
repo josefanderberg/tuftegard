@@ -7,9 +7,11 @@ export const defaultContent = {
     },
     intro: {
         label: "Vår Filosofi",
-        title: "Ikkje berre ein gard, men ein tilstand",
-        lead: "Me har henta inspirasjon frå dei italienske vinlundane, der måltidet nytast midt i råvarene. Hos oss spring du ikkje rundt – du landar. Du finn roen.",
-        text: "Her sit du midt i morellhagen. Om sommaren under ein klar, blå himmel med eit glas kjølig drikke i handa. Om vinteren pakkar me oss inn i ullpledd rundt store bålpanner, medan dufta av varm mat stig mot stjernene."
+        title: "Opplevinga på Tufte",
+        gardenTitle: "Garden",
+        gardenText: "Me har henta inspirasjon frå dei italienske vinlundane, der måltidet nytast midt i råvarene. Hos oss spring du ikkje rundt – du landar. Du finn roen. Her sit du midt i morellhagen, omkransa av naturen.",
+        foodTitle: "Maten",
+        foodText: "Maten vår er ærleg og laga med kjærleik over open eld. Om sommaren nyt du friske smakar under blå himmel, og om vinteren varmar me oss kring store bålpanner medan dufta av grillmat stig mot stjernene."
     },
     winter: {
         label: "Vinter: Nytt Konsept",
