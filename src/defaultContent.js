@@ -36,11 +36,13 @@ export const defaultContent = {
         ],
         mainCourses: [
             {
-                title: "Grillplanke (Pris pr. pers: 399 kr inkl. dessert)",
+                title: "Grillplanke",
+                price: "(Pris pr. pers: 399 kr inkl. dessert)",
                 description: "Me serverer kjøtt som ølmarinert svinekjake, lokale pølser m.m., grønnsakspyd, grilla flatbrød, fries og tilbehør som verkeleg løfter smaksopplevelsen. Me er behjelpelege med grillinga."
             },
             {
-                title: "Tuftes Chili con Carne (Pris pr. pers: 329 kr inkl. dessert)",
+                title: "Tuftes Chili con Carne",
+                price: "(Pris pr. pers: 329 kr inkl. dessert)",
                 description: "Serverast i baren med ris, brød, nachoschips og anna deilig tilbehør."
             }
         ],
@@ -67,6 +69,11 @@ export const defaultContent = {
             "14:00 - 17:00",
             "18:00 - 22:00"
         ]
+    },
+    confirmationPopup: {
+        title: "Takk for di bestilling!",
+        message1: "Me har mottatt di førespurnad og vil sjå over den.",
+        message2: "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."
     },
     footer: {
         text: "Tufte Gård © 2025 | Der matkultur møter natur"

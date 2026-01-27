@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, where, limit, startAfter } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, where, limit, startAfter, updateDoc } from 'firebase/firestore';
 
 // Importera svenska för att få måndag som första dag (Söndag längst till höger)
 import sv from 'date-fns/locale/sv';
@@ -20,6 +20,7 @@ const Admin = ({ content, onSave }) => {
     const [historyBookings, setHistoryBookings] = useState([]); // Historiska
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [editingBooking, setEditingBooking] = useState(null); // För redigering
 
     // Historik state
     const [showHistory, setShowHistory] = useState(false);
@@ -270,6 +271,22 @@ const Admin = ({ content, onSave }) => {
         }
     }
 
+    const handleUpdateBooking = async (e) => {
+        e.preventDefault();
+        if (!editingBooking) return;
+        try {
+            await updateDoc(doc(db, "bookings", editingBooking.id), {
+                ...editingBooking,
+                dishes: editingBooking.dishes || {}
+            });
+            alert("Bokning uppdaterad!");
+            setEditingBooking(null);
+            fetchBookings();
+        } catch (error) {
+            alert("Kunde inte uppdatera: " + error.message);
+        }
+    };
+
 
     // --- HELPERS (Content editing) ---
     const handleChange = (section, key, value) => {
@@ -474,6 +491,7 @@ const Admin = ({ content, onSave }) => {
                                                                 {b.dishes ? Object.entries(b.dishes).map(([d, c]) => <div key={d}>{c}x {d}</div>) : '-'}
                                                             </td>
                                                             <td style={{ padding: '8px', textAlign: 'right' }}>
+                                                                <button onClick={() => setEditingBooking(b)} style={{ marginRight: '10px', color: '#c5a059', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✎</button>
                                                                 <button onClick={() => deleteBooking(b.id)} style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
                                                             </td>
                                                         </tr>
@@ -494,6 +512,69 @@ const Admin = ({ content, onSave }) => {
                                             Ladda äldre bokningar
                                         </button>
                                     )}
+                                </div>
+                            )}
+
+                            {/* MODAL FÖR REDIGERING AV BOKNING */}
+                            {editingBooking && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000 }}>
+                                    <div style={{ background: '#333', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px' }}>
+                                        <h3 style={{ color: '#c5a059', marginBottom: '20px' }}>Redigera Bokning</h3>
+                                        <form onSubmit={handleUpdateBooking}>
+                                            <div style={{ marginBottom: '15px' }}>
+                                                <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Datum</label>
+                                                <input type="date" value={editingBooking.date} onChange={e => setEditingBooking({ ...editingBooking, date: e.target.value })} style={{ width: '100%', padding: '10px' }} />
+                                            </div>
+                                            <div style={{ marginBottom: '15px' }}>
+                                                <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Tid</label>
+                                                <input type="text" value={editingBooking.time} onChange={e => setEditingBooking({ ...editingBooking, time: e.target.value })} style={{ width: '100%', padding: '10px' }} />
+                                            </div>
+                                            <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Namn</label>
+                                                    <input type="text" value={editingBooking.name} onChange={e => setEditingBooking({ ...editingBooking, name: e.target.value })} style={{ width: '100%', padding: '10px' }} />
+                                                </div>
+                                                <div style={{ flex: 0.5 }}>
+                                                    <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Gäster</label>
+                                                    <input type="number" value={editingBooking.guests} onChange={e => setEditingBooking({ ...editingBooking, guests: e.target.value })} style={{ width: '100%', padding: '10px' }} />
+                                                </div>
+                                            </div>
+                                            <div style={{ marginBottom: '15px' }}>
+                                                <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Telefon</label>
+                                                <input type="text" value={editingBooking.phone} onChange={e => setEditingBooking({ ...editingBooking, phone: e.target.value })} style={{ width: '100%', padding: '10px' }} />
+                                            </div>
+                                            <div style={{ marginBottom: '15px' }}>
+                                                <label style={{ display: 'block', color: '#aaa', fontSize: '0.8rem' }}>Noteringar</label>
+                                                <textarea value={editingBooking.notes || ''} onChange={e => setEditingBooking({ ...editingBooking, notes: e.target.value })} style={{ width: '100%', padding: '10px', height: '80px' }} />
+                                            </div>
+
+                                            <div style={{ background: '#222', padding: '10px', borderRadius: '4px', marginBottom: '15px' }}>
+                                                <label style={{ fontSize: '0.8rem', color: '#aaa', marginBottom: '5px', display: 'block' }}>Mat (ändra antal)</label>
+                                                {content.menu?.mainCourses?.map(dish => (
+                                                    <div key={dish.title} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                                                        <span style={{ fontSize: '0.9rem' }}>{dish.title}</span>
+                                                        <input
+                                                            type="number" min="0" placeholder="0"
+                                                            value={editingBooking.dishes?.[dish.title] || 0}
+                                                            style={{ width: '50px', padding: '3px', textAlign: 'center' }}
+                                                            onChange={(e) => setEditingBooking({
+                                                                ...editingBooking,
+                                                                dishes: {
+                                                                    ...editingBooking.dishes,
+                                                                    [dish.title]: parseInt(e.target.value)
+                                                                }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                <button type="button" onClick={() => setEditingBooking(null)} style={{ flex: 1, padding: '10px', background: '#555', color: '#fff', border: 'none', cursor: 'pointer' }}>Avbryt</button>
+                                                <button type="submit" style={{ flex: 1, padding: '10px', background: '#c5a059', color: '#000', border: 'none', cursor: 'pointer' }}>Spara Ändringar</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -606,14 +687,34 @@ const Admin = ({ content, onSave }) => {
                         <h2>Hemsidans Text</h2>
 
                         <div className="group-box">
+                            <h3>Bekräftelse Popup (Efter bokning)</h3>
+                            <Input label="Rubrik" value={formData.confirmationPopup?.title} onChange={(e) => handleChange('confirmationPopup', 'title', e.target.value)} />
+                            <TextArea label="Meddelande Rad 1" value={formData.confirmationPopup?.message1} onChange={(e) => handleChange('confirmationPopup', 'message1', e.target.value)} />
+                            <TextArea label="Meddelande Rad 2" value={formData.confirmationPopup?.message2} onChange={(e) => handleChange('confirmationPopup', 'message2', e.target.value)} />
+                        </div>
+
+                        <div className="group-box">
                             <h3>Hero / Topp</h3>
                             <Input label="Rubrik" value={formData.hero?.title} onChange={(e) => handleChange('hero', 'title', e.target.value)} />
                             <Input label="Underrubrik" value={formData.hero?.subtitle} onChange={(e) => handleChange('hero', 'subtitle', e.target.value)} />
                             <TextArea label="Text" value={formData.hero?.description} onChange={(e) => handleChange('hero', 'description', e.target.value)} />
                             <Input label="Knapp" value={formData.hero?.buttonText} onChange={(e) => handleChange('hero', 'buttonText', e.target.value)} />
                         </div>
-                        {/* More text sections... */}
-                        {/* Skipping repeated sections for brevity, assuming they are kept as requested */}
+
+                        <div className="group-box">
+                            <h3>Intro / Filosofi</h3>
+                            <Input label="Rubrik (Huvud)" value={formData.intro?.title} onChange={(e) => handleChange('intro', 'title', e.target.value)} />
+                            <Input label="Etikett" value={formData.intro?.label} onChange={(e) => handleChange('intro', 'label', e.target.value)} />
+
+                            <h4 style={{ marginTop: '15px', color: '#c5a059' }}>Del 1: Garden (Vänster bild)</h4>
+                            <Input label="Rubrik (Garden)" value={formData.intro?.gardenTitle} onChange={(e) => handleChange('intro', 'gardenTitle', e.target.value)} />
+                            <TextArea label="Text (Garden)" value={formData.intro?.gardenText} onChange={(e) => handleChange('intro', 'gardenText', e.target.value)} />
+
+                            <h4 style={{ marginTop: '15px', color: '#c5a059' }}>Del 2: Maten (Höger bild)</h4>
+                            <Input label="Rubrik (Maten)" value={formData.intro?.foodTitle} onChange={(e) => handleChange('intro', 'foodTitle', e.target.value)} />
+                            <TextArea label="Text (Maten)" value={formData.intro?.foodText} onChange={(e) => handleChange('intro', 'foodText', e.target.value)} />
+                        </div>
+
                         <div className="group-box">
                             <h3>Vinter / Säsong</h3>
                             <Input label="Rubrik" value={formData.winter?.title} onChange={(e) => handleChange('winter', 'title', e.target.value)} />
@@ -627,13 +728,28 @@ const Admin = ({ content, onSave }) => {
                             {/* ... Maträtter ... */}
                             <h4 style={{ marginTop: '20px' }}>Maträtter & Dryck</h4>
                             {formData.menu?.mainCourses?.map((dish, i) => (
-                                <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px', padding: '10px', background: '#333' }}>
-                                    <input value={dish.title} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'title', e.target.value)} style={{ flex: 1 }} />
-                                    <input value={dish.description} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'description', e.target.value)} style={{ flex: 2 }} />
-                                    <button onClick={() => handleDeleteItem('menu', 'mainCourses', i)} style={{ color: 'red' }}>X</button>
+                                <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px', padding: '10px', background: '#333', flexDirection: 'column' }}>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input placeholder="Maträtt" value={dish.title} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'title', e.target.value)} style={{ flex: 1, padding: '8px' }} />
+                                        <input placeholder="Pris/Info (t.ex '(Pris pr. pers...)')" value={dish.price} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'price', e.target.value)} style={{ flex: 1, padding: '8px' }} />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input placeholder="Beskrivning" value={dish.description} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'description', e.target.value)} style={{ flex: 1, padding: '8px' }} />
+                                        <button onClick={() => handleDeleteItem('menu', 'mainCourses', i)} style={{ color: 'red', padding: '8px' }}>X</button>
+                                    </div>
                                 </div>
                             ))}
-                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', description: '' })}>+ Rätt</button>
+                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '' })}>+ Rätt</button>
+
+                            <h4 style={{ marginTop: '20px' }}>Dryck / Barnmeny</h4>
+                            {formData.menu?.drinksGroups?.map((dish, i) => (
+                                <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px', padding: '10px', background: '#333' }}>
+                                    <input value={dish.title} onChange={e => handleObjectArrayChange('menu', 'drinksGroups', i, 'title', e.target.value)} style={{ flex: 1 }} />
+                                    <input value={dish.description} onChange={e => handleObjectArrayChange('menu', 'drinksGroups', i, 'description', e.target.value)} style={{ flex: 2 }} />
+                                    <button onClick={() => handleDeleteItem('menu', 'drinksGroups', i)} style={{ color: 'red' }}>X</button>
+                                </div>
+                            ))}
+                            <button onClick={() => handleAddItem('menu', 'drinksGroups', { title: 'Ny', description: '' })}>+ Grupp</button>
                         </div>
                     </div>
 

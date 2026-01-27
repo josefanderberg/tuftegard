@@ -16,12 +16,10 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
-                }
+                // Uppdatera isVisible varje gång elementet går in/ut ur viewport
+                setIsVisible(entry.isIntersecting);
             },
-            { threshold: 0.1 }
+            { threshold: 0.15 } // 15% synligt för att trigga
         );
         if (ref.current) observer.observe(ref.current);
         return () => observer.disconnect();
@@ -35,6 +33,8 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
 };
 
 const Home = ({ content: propContent }) => {
+    // ... (rest of imports/state) ...
+
     // Merge propContent with defaultContent to ensure new keys exist
     // This is a simple deep merge for specific sections we know changed
     const content = {
@@ -273,32 +273,44 @@ const Home = ({ content: propContent }) => {
                 </div>
             </section>
 
-            <section className="section-container text-center intro-text">
-                <span className="label">{content.intro.label}</span>
-                <h3>{content.intro.title}</h3>
-                <div className="divider">❦</div>
 
-                <div className="intro-split">
-                    <RevealOnScroll className="intro-col slide-left">
-                        <h4>{content.intro.gardenTitle}</h4>
-                        <p>{content.intro.gardenText}</p>
-                    </RevealOnScroll>
-                    <RevealOnScroll className="intro-col slide-right">
-                        <h4>{content.intro.foodTitle}</h4>
-                        <p>{content.intro.foodText}</p>
-                    </RevealOnScroll>
-                </div>
-            </section>
 
-            <RevealOnScroll id="stemning" className="split-section reverse">
-                <div className="split-image" style={{ backgroundImage: "url('/tufte3.png')" }}></div>
-                <div className="split-content">
+            {/* --- SEKTION 2: GARDEN (Bild Vänster / Text Höger) --- */}
+            <div className="split-section">
+                <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte8.png')" }}>
+                    {/* Bild Container */}
+                </RevealOnScroll>
+                <RevealOnScroll className="split-content slide-right">
+                    <span className="label">Omgivnadene</span>
+                    <h4>{content.intro.gardenTitle}</h4>
+                    <p>{content.intro.gardenText}</p>
+                </RevealOnScroll>
+            </div>
+
+            {/* --- SEKTION 3: MATEN (Bild Höger / Text Vänster) --- */}
+            <div className="split-section reverse">
+                <RevealOnScroll className="split-image slide-right" style={{ backgroundImage: "url('/tufte11.png')" }}>
+                    {/* Bild Container */}
+                </RevealOnScroll>
+                <RevealOnScroll className="split-content slide-left">
+                    <span className="label">Det Kulinariske</span>
+                    <h4>{content.intro.foodTitle}</h4>
+                    <p>{content.intro.foodText}</p>
+                </RevealOnScroll>
+            </div>
+
+            {/* --- SEKTION 4: VINTER/STÄMNING (Bild Vänster / Text Höger) --- */}
+            <div id="stemning" className="split-section">
+                <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte3.png')" }}>
+                    {/* Bild Container */}
+                </RevealOnScroll>
+                <RevealOnScroll className="split-content slide-right">
                     <span className="label">{content.winter.label}</span>
                     <h3>{content.winter.title}</h3>
                     <p><strong>{content.winter.textPart1.split('.')[0] + '.'}</strong> {content.winter.textPart1.split('.').slice(1).join('.')}</p>
                     <p>{content.winter.textPart2}</p>
-                </div>
-            </RevealOnScroll>
+                </RevealOnScroll>
+            </div>
 
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
@@ -334,7 +346,7 @@ const Home = ({ content: propContent }) => {
                                 {mainCourses.length > 0 ? (
                                     mainCourses.map((item, index) => (
                                         <li key={index}>
-                                            <strong>{item.title}</strong>
+                                            <strong>{item.title} {item.price && <span>{item.price}</span>}</strong>
                                             <span>{item.description}</span>
                                         </li>
                                     ))
@@ -415,7 +427,10 @@ const Home = ({ content: propContent }) => {
                             <p style={{ fontSize: '0.9rem', color: '#777', marginBottom: '20px', textAlign: 'center' }}>Vennligst oppgi antall på hver rett som ønskes servert til selskapet.</p>
                             {mainCourses.map((dish, index) => (
                                 <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                    <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>{dish.title}</label>
+                                    <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>
+                                        {dish.title}
+                                        {dish.price && <span style={{ display: 'block', fontSize: '0.8em', color: '#999', fontWeight: 'normal' }}>{dish.price}</span>}
+                                    </label>
                                     <input type="number" min="0" placeholder="0" style={{ width: '80px', height: '40px', padding: '5px', textAlign: 'center' }} onChange={(e) => handleDishCountChange(dish.title, e.target.value)} />
                                 </div>
                             ))}
@@ -444,9 +459,9 @@ const Home = ({ content: propContent }) => {
             {showConfirmation && (
                 <div className="popup-overlay">
                     <div className="popup-content">
-                        <h3>Takk for di bestilling!</h3>
-                        <p>Me har mottatt di førespurnad og vil sjå over den.</p>
-                        <p>Du vil høyre frå oss på SMS så snart me har bekrefta bordet.</p>
+                        <h3>{content.confirmationPopup?.title || "Takk for di bestilling!"}</h3>
+                        <p>{content.confirmationPopup?.message1 || "Me har mottatt di førespurnad og vil sjå over den."}</p>
+                        <p>{content.confirmationPopup?.message2 || "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."}</p>
                         <button className="btn-primary" onClick={closeConfirmation}>Lukk</button>
                     </div>
                 </div>
