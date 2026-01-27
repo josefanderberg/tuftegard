@@ -38,7 +38,7 @@ const Admin = ({ content, onSave }) => {
         date: '',
         name: 'Manuell Bokning',
         guests: 4,
-        email: '',
+        phone: '',
         time: '',
         dishes: {}
     });
@@ -251,7 +251,7 @@ const Admin = ({ content, onSave }) => {
             setManualBooking(prev => ({
                 ...prev,
                 name: 'Manuell Bokning',
-                email: '',
+                phone: '',
                 guests: 4,
                 dishes: {}
             }));
@@ -467,7 +467,7 @@ const Admin = ({ content, onSave }) => {
                                                             <td style={{ padding: '8px' }}>{b.time}</td>
                                                             <td style={{ padding: '8px' }}>
                                                                 <strong>{b.name}</strong><br />
-                                                                <span style={{ fontSize: '0.8rem', color: '#888' }}>{b.email}</span>
+                                                                <span style={{ fontSize: '0.8rem', color: '#888' }}>{b.phone}</span>
                                                             </td>
                                                             <td style={{ padding: '8px' }}>{b.guests} st</td>
                                                             <td style={{ padding: '8px' }}>
@@ -536,8 +536,16 @@ const Admin = ({ content, onSave }) => {
                                         <input type="text" required value={manualBooking.name} onChange={e => setManualBooking({ ...manualBooking, name: e.target.value })} style={{ width: '100%', padding: '8px' }} />
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Antal Gäster</label>
-                                        <input type="number" required value={manualBooking.guests} onChange={e => setManualBooking({ ...manualBooking, guests: e.target.value })} style={{ width: '100%', padding: '8px' }} />
+                                        <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Telefon</label>
+                                        <input type="text" placeholder="Tlf" value={manualBooking.phone} onChange={e => setManualBooking({ ...manualBooking, phone: e.target.value })} style={{ width: '100%', padding: '8px' }} />
+                                    </div>
+                                    <div style={{ flex: 0.5 }}>
+                                        <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Gäster</label>
+                                        <select required value={manualBooking.guests} onChange={e => setManualBooking({ ...manualBooking, guests: e.target.value })} style={{ width: '100%', padding: '8px' }}>
+                                            {Array.from({ length: 17 }, (_, i) => i + 4).map(num => (
+                                                <option key={num} value={num}>{num}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
 
