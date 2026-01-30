@@ -8,6 +8,7 @@ export const defaultContent = {
     intro: {
         label: "Vår Filosofi",
         title: "Opplevinga på Tufte",
+        description: "Me har store draumar for framtida. Planen er å bygge om låven til restaurant, auke morellproduksjonen og fortsette å spreie matglede og unike naturopplevingar i godt selskap.",
         gardenTitle: "Garden",
         gardenText: "Me har henta inspirasjon frå dei italienske vinlundane, der måltidet nytast midt i råvarene. Hos oss spring du ikkje rundt – du landar. Du finn roen. Her sit du midt i morellhagen, omkransa av naturen.",
         foodTitle: "Maten",
@@ -26,14 +27,10 @@ export const defaultContent = {
     menu: {
         label: "Sesongens Oppleving",
         title: "Vintermeny: Rundt Bålet",
-        intro: "Mat bestilles på forhånd og dessert er inkludert i prisen, her er det berre å glede seg! I baren finn du varme drikker, deilige varme drinker og mykje anna godt å kose seg med mellom glørne.",
-        priceNote: "Romjulstider: Me held ope 26., 27. og 28. desember. Følg oss for annonsering av helgeopningar framover!",
-        priceNotePrefix: "Romjulstider:",
-        openingTimes: [
-            "26.desember - første sitting: 14 til 17 | Andre sitting: 18 til 22",
-            "27.desember - første sitting: 14 til 17 | Andre sitting: 18 til 22",
-            "28.desember - 15 til 18"
-        ],
+        intro: "Mat bestilles på forhånd og dessert er inkludert i prisen! I baren finn du øl, vin, deilige varme drinker og mykje anna godt å kose seg med mellom glørne.",
+        priceNote: "",
+        priceNotePrefix: "",
+        openingTimes: [],
         mainCourses: [
             {
                 title: "Grillplanke",

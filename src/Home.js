@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import nb from 'date-fns/locale/nb';
+import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import './App.css';
 import { db } from './firebase';
@@ -7,6 +9,10 @@ import { collection, addDoc, getDocs, query } from 'firebase/firestore';
 import emailjs from '@emailjs/browser';
 
 import { defaultContent } from './defaultContent';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+
+registerLocale('nb', nb);
 
 // --- ANIMATION KOMPONENT ---
 const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
@@ -16,10 +22,13 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                // Uppdatera isVisible varje gång elementet går in/ut ur viewport
-                setIsVisible(entry.isIntersecting);
+                // VIKTIGT: Triggas bara EN gång (observer.disconnect())
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
             },
-            { threshold: 0.15 } // 15% synligt för att trigga
+            { threshold: 0.1 } // Lite lägre tröskel så det säkert händer
         );
         if (ref.current) observer.observe(ref.current);
         return () => observer.disconnect();
@@ -247,7 +256,7 @@ const Home = ({ content: propContent }) => {
 
     return (
         <div className="App">
-            <div className="hero-bg-fixed" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('/tufte7.png')" }}></div>
+            <div className="hero-bg-fixed" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('/tufte2.png')" }}></div>
 
             <header className={`header ${scrolled ? 'scrolled' : ''}`}>
                 <div className="header-container">
@@ -256,7 +265,7 @@ const Home = ({ content: propContent }) => {
                         <span className="bar"></span><span className="bar"></span><span className="bar"></span>
                     </button>
                     <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
-                        <button onClick={() => scrollToSection('stemning')}>Stemning</button>
+                        <button onClick={() => scrollToSection('arrangemant')}>Arrangemant</button>
                         <button onClick={() => scrollToSection('galleri')}>Galleri</button>
                         <button onClick={() => scrollToSection('meny')}>Mat & Drikke</button>
                         <button onClick={() => scrollToSection('kontakt')} className="btn-book">Bestill Bålpanne</button>
@@ -269,11 +278,17 @@ const Home = ({ content: propContent }) => {
                     <span className="subtitle">{content.hero.subtitle}</span>
                     <h2>{content.hero.title}</h2>
                     <p>{content.hero.description}</p>
-                    <button className="btn-primary" onClick={() => scrollToSection('stemning')}>{content.hero.buttonText}</button>
+                    <button className="btn-primary" onClick={() => scrollToSection('arrangemant')}>{content.hero.buttonText}</button>
                 </div>
             </section>
 
 
+
+            {/* --- SEKTION 1: INTRO / FILOSOFI (Only Label + Symbol) --- */}
+            <section className="text-center" style={{ padding: '80px 20px 40px', backgroundColor: '#fff', position: 'relative', zIndex: 1 }}>
+                <span className="label" style={{ marginBottom: '5px' }}>{content.intro.label}</span>
+                <div className="divider" style={{ marginTop: '10px' }}>❦</div>
+            </section>
 
             {/* --- SEKTION 2: GARDEN (Bild Vänster / Text Höger) --- */}
             <div className="split-section">
@@ -300,7 +315,7 @@ const Home = ({ content: propContent }) => {
             </div>
 
             {/* --- SEKTION 4: VINTER/STÄMNING (Bild Vänster / Text Höger) --- */}
-            <div id="stemning" className="split-section">
+            <div id="arrangemant" className="split-section">
                 <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte3.png')" }}>
                     {/* Bild Container */}
                 </RevealOnScroll>
@@ -310,7 +325,52 @@ const Home = ({ content: propContent }) => {
                     <p><strong>{content.winter.textPart1.split('.')[0] + '.'}</strong> {content.winter.textPart1.split('.').slice(1).join('.')}</p>
                     <p>{content.winter.textPart2}</p>
                 </RevealOnScroll>
+
             </div>
+
+            {/* --- KOMMENDE ARRANGEMANG --- */}
+            <section className="events-section">
+                <div className="section-header">
+                    <span className="label">Det skjer på garden</span>
+                    <h3>Kommende Arrangemang</h3>
+                    <p>Sett av datoen for våre spesielle kvelder.</p>
+                </div>
+
+                <div className="events-grid">
+                    {/* Eksempel Event 1 */}
+                    <RevealOnScroll className="event-card">
+                        <div className="event-date-large">
+                            <span className="day">14</span>
+                            <span className="month">Feb</span>
+                        </div>
+                        <h4>Valentinsmiddag</h4>
+                        <p>Ta med din kjære på en romantisk 5-retters meny under stjernene. Levende lys og god stemning.</p>
+                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Bestill Bord</span>
+                    </RevealOnScroll>
+
+                    {/* Eksempel Event 2 */}
+                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.2s' }}>
+                        <div className="event-date-large">
+                            <span className="day">20</span>
+                            <span className="month">Mar</span>
+                        </div>
+                        <h4>Vinskule & Smaking</h4>
+                        <p>Lær om italienske viner med vår sommelier. Smaking av 6 ulike viner med tilhørende småretter.</p>
+                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Meld deg på</span>
+                    </RevealOnScroll>
+
+                    {/* Eksempel Event 3 */}
+                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.4s' }}>
+                        <div className="event-date-large">
+                            <span className="day">10</span>
+                            <span className="month">Apr</span>
+                        </div>
+                        <h4>Vårfest på Låven</h4>
+                        <p>Vi feirer at våren er i anmarsj! Live musikk, dans og grilling av årets første lam.</p>
+                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Les mer</span>
+                    </RevealOnScroll>
+                </div>
+            </section>
 
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
@@ -333,14 +393,14 @@ const Home = ({ content: propContent }) => {
                 )}
             </section>
 
-            <RevealOnScroll id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte3.png')" }}>
+            <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte3.png')" }}>
                 <div className="menu-overlay"></div>
                 <div className="menu-content-wrapper">
                     <span className="label" style={{ color: 'var(--gold)' }}>{content.menu.label}</span>
                     <h3 className="yellowh3">{content.menu.title}</h3>
                     <p className="menu-intro">{content.menu.intro}</p>
-                    <div className="menu-columns">
-                        <div className="menu-col">
+                    <div className="menu-columns" style={{ justifyContent: 'center' }}>
+                        <div className="menu-col" style={{ flex: '0 0 100%', maxWidth: '800px' }}>
                             <h4>Hovudrettar</h4>
                             <ul>
                                 {mainCourses.length > 0 ? (
@@ -355,34 +415,12 @@ const Home = ({ content: propContent }) => {
                                 )}
                             </ul>
                         </div>
-                        <div className="menu-col">
-                            <h4>I Koppen & For de minste</h4>
-                            <ul>
-                                {drinksGroups.length > 0 ? (
-                                    drinksGroups.map((item, index) => (
-                                        <li key={index}>
-                                            <strong>{item.title}</strong>
-                                            <span>{item.description}</span>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <p>Inga alternativ tillgängliga.</p>
-                                )}
-                            </ul>
-                        </div>
                     </div>
-                    <p className="price-note">
-                        <em><strong>{content.menu.priceNotePrefix}</strong> {content.menu.priceNote.replace(content.menu.priceNotePrefix, '')}</em>
-                    </p>
-                    <div className="menu-times">
-                        {content.menu.openingTimes.map((time, idx) => (
-                            <p key={idx}>{time}</p>
-                        ))}
-                    </div>
-                </div>
-            </RevealOnScroll>
 
-            <RevealOnScroll id="kontakt" className="booking-section">
+                </div>
+            </section>
+
+            <section id="kontakt" className="booking-section">
                 <div className="booking-container">
                     <h3>{content.booking.title}</h3>
                     <p>{content.booking.subtitle}</p>
@@ -390,7 +428,22 @@ const Home = ({ content: propContent }) => {
                     <form className="booking-form" onSubmit={handleSubmitBooking}>
                         <div className="input-grid-row">
                             <input type="text" placeholder="Ditt namn" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                            <input type="tel" placeholder="Mobilnummer" required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                            <div className="phone-input-wrapper">
+                                <PhoneInput
+                                    country={'no'}
+                                    preferredCountries={['no', 'se']}
+                                    value={formData.phone}
+                                    onChange={phone => setFormData({ ...formData, phone })}
+                                    inputProps={{
+                                        name: 'phone',
+                                        required: true,
+                                        placeholder: 'Mobilnummer'
+                                    }}
+                                    containerClass="custom-phone-container"
+                                    inputClass="custom-phone-input"
+                                    buttonClass="custom-phone-button"
+                                />
+                            </div>
                         </div>
 
                         <div className="input-grid-row" style={{ gridTemplateColumns: '1fr' }}>
@@ -399,12 +452,42 @@ const Home = ({ content: propContent }) => {
                                 selected={bookingDate}
                                 onChange={(date) => setBookingDate(date)}
                                 includeDates={openDates}
+                                locale="nb"
                                 // EXCLUDE FULLA DATUM
                                 excludeDates={fullyBookedDates.map(d => new Date(d))}
                                 placeholderText="Velg tilgjengelig dato"
                                 dateFormat="yyyy-MM-dd"
                                 required
                                 wrapperClassName="react-datepicker-wrapper-custom"
+                                renderCustomHeader={({
+                                    date,
+                                    decreaseMonth,
+                                    increaseMonth,
+                                    prevMonthButtonDisabled,
+                                    nextMonthButtonDisabled,
+                                }) => (
+                                    <div style={{
+                                        margin: "5px 10px", // Mindre marginal
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        background: 'transparent'
+                                    }}>
+                                        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} type="button"
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>
+                                            {"‹"}
+                                        </button>
+
+                                        <div style={{ fontWeight: 'bold', color: '#c5a059', textTransform: 'capitalize', whiteSpace: 'nowrap', fontSize: '1rem' }}>
+                                            {format(date, "MMMM yyyy", { locale: nb })}
+                                        </div>
+
+                                        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} type="button"
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>
+                                            {"›"}
+                                        </button>
+                                    </div>
+                                )}
                             />
                         </div>
 
@@ -442,7 +525,7 @@ const Home = ({ content: propContent }) => {
                     </form>
                     <p className="booking-info">{content.booking.contactInfo}</p>
                 </div>
-            </RevealOnScroll>
+            </section>
             <footer className="footer">
                 <div className="footer-content">
                     <div className="social-links">
@@ -456,17 +539,19 @@ const Home = ({ content: propContent }) => {
                     <p>{content.footer.text}</p>
                 </div>
             </footer>
-            {showConfirmation && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
-                        <h3>{content.confirmationPopup?.title || "Takk for di bestilling!"}</h3>
-                        <p>{content.confirmationPopup?.message1 || "Me har mottatt di førespurnad og vil sjå over den."}</p>
-                        <p>{content.confirmationPopup?.message2 || "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."}</p>
-                        <button className="btn-primary" onClick={closeConfirmation}>Lukk</button>
+            {
+                showConfirmation && (
+                    <div className="popup-overlay">
+                        <div className="popup-content">
+                            <h3>{content.confirmationPopup?.title || "Takk for di bestilling!"}</h3>
+                            <p>{content.confirmationPopup?.message1 || "Me har mottatt di førespurnad og vil sjå over den."}</p>
+                            <p>{content.confirmationPopup?.message2 || "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."}</p>
+                            <button className="btn-primary" onClick={closeConfirmation}>Lukk</button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

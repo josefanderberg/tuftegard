@@ -117,7 +117,7 @@ button {
   transition: 0.3s;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 868px) {
   .menu-toggle {
     display: flex;
   }
@@ -302,10 +302,17 @@ button {
   transform: translateX(0);
 }
 
-/* --- SPLIT SECTION (Bilde + Text) --- */
+/* --- SPLIT SECTION (Full Width Blocks) --- */
 .split-section {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
+  margin: 0;
+  background-color: #fff;
+}
+
+.split-section:hover {
+  transform: none;
 }
 
 .split-section.reverse {
@@ -316,6 +323,14 @@ button {
 .split-content {
   flex: 1;
   min-width: 300px;
+}
+
+.split-content {
+  padding: 80px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
 }
 
 .split-image {
@@ -369,9 +384,9 @@ button {
   transition: transform 0.3s;
 }
 
-.masonry-item img:hover {
+/* .masonry-item img:hover {
   transform: scale(1.02);
-}
+} */
 
 /* NYTT: Galleri Knapp */
 .gallery-button-container {
@@ -577,6 +592,43 @@ button {
   }
 }
 
+/* --- TELEFON INPUT STYLING (React Phone Input 2 Override) --- */
+.phone-input-wrapper {
+  width: 100%;
+}
+
+.custom-phone-container {
+  width: 100% !important;
+}
+
+.custom-phone-input {
+  width: 100% !important;
+  height: 52px !important;
+  font-size: 1rem !important;
+  font-family: var(--font-sans) !important;
+  border-radius: 2px !important;
+  border: 1px solid #ddd !important;
+  padding-left: 48px !important;
+  /* Plats för flaggan */
+}
+
+.custom-phone-button {
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid #ddd !important;
+  border-radius: 2px 0 0 2px !important;
+}
+
+.react-tel-input .flag-dropdown {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.react-tel-input .selected-flag:hover,
+.react-tel-input .selected-flag:focus {
+  background-color: #f5f5f5 !important;
+}
+
 .booking-form button {
   background-color: var(--primary-dark);
   color: var(--gold);
@@ -649,11 +701,19 @@ button {
   background-color: var(--primary-dark) !important;
   color: #fff !important;
   border-bottom: none !important;
+  padding-top: 5px !important;
+  /* Minska höjden */
 }
 
 .react-datepicker__current-month,
 .react-datepicker__day-name {
   color: var(--gold) !important;
+}
+
+/* FIX: Pilarna för månadbyte */
+.react-datepicker__navigation {
+  display: none !important;
+  /* Döljer standardpilarna då vi har custom header */
 }
 
 .react-datepicker__day--selected,
@@ -739,8 +799,117 @@ button {
 
 .social-icon:hover {
   color: var(--gold);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
+
+/* --- EVENTS SECTION (Kommende Arrangemang - SLIDER) --- */
+.events-section {
+  padding: 80px 0;
+  /* Full width container handling padding internally */
+  background-color: #f8f8f8;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  /* Prevent scrollbars from messing up layout */
+}
+
+.events-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  /* Prevent wrapping */
+  overflow-x: auto;
+  /* Allow horizontal scroll */
+  gap: 20px;
+  padding: 20px 20px 40px 20px;
+  /* Bottom padding for scrollbar or shadow */
+  scroll-snap-type: x mandatory;
+  /* Enable snap scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* Smooth scrolling on iOS */
+  max-width: 100%;
+  margin: 0;
+
+  /* Hide scrollbar for cleaner look (optional) */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.events-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.event-card {
+  flex: 0 0 300px;
+  /* Fixed width, don't grow or shrink */
+  background: #fff;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 5px solid transparent;
+  scroll-snap-align: center;
+  /* Snap to center */
+}
+
+.event-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  border-top-color: var(--gold);
+}
+
+.event-date-large {
+  font-family: var(--font-serif);
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.event-date-large .day {
+  display: block;
+  font-size: 3.5rem;
+  font-weight: 700;
+}
+
+.event-date-large .month {
+  display: block;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 5px;
+}
+
+.event-card h4 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--primary-dark);
+}
+
+.event-card p {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
+
+.btn-event {
+  display: inline-block;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-dark);
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 2px;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.btn-event:hover {
+  color: var(--gold);
+}
+
+
 
 .social-icon svg {
   width: 28px;
@@ -789,9 +958,10 @@ button {
     text-align: center;
   }
 }
+
 /* Ensure body doesn't scroll horizontally due to transforms */
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 /* --- POPUP MODAL --- */
@@ -834,11 +1004,23 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

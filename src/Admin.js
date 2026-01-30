@@ -705,6 +705,7 @@ const Admin = ({ content, onSave }) => {
                             <h3>Intro / Filosofi</h3>
                             <Input label="Rubrik (Huvud)" value={formData.intro?.title} onChange={(e) => handleChange('intro', 'title', e.target.value)} />
                             <Input label="Etikett" value={formData.intro?.label} onChange={(e) => handleChange('intro', 'label', e.target.value)} />
+                            <TextArea label="Text (Intro - Framtidsplaner)" value={formData.intro?.description} onChange={(e) => handleChange('intro', 'description', e.target.value)} />
 
                             <h4 style={{ marginTop: '15px', color: '#c5a059' }}>Del 1: Garden (Vänster bild)</h4>
                             <Input label="Rubrik (Garden)" value={formData.intro?.gardenTitle} onChange={(e) => handleChange('intro', 'gardenTitle', e.target.value)} />
