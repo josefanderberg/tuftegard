@@ -738,9 +738,26 @@ const Admin = ({ content, onSave }) => {
                                         <input placeholder="Beskrivning" value={dish.description} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'description', e.target.value)} style={{ flex: 1, padding: '8px' }} />
                                         <button onClick={() => handleDeleteItem('menu', 'mainCourses', i)} style={{ color: 'red', padding: '8px' }}>X</button>
                                     </div>
+                                    <div style={{ marginTop: '5px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#aaa', marginRight: '5px' }}>Datumstyrd:</label>
+                                            <input type="date" value={dish.specificDate || ''} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'specificDate', e.target.value)} style={{ padding: '5px', background: '#444', border: '1px solid #555', color: '#fff' }} />
+                                        </div>
+                                        {dish.specificDate && (
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={dish.isExclusive || false}
+                                                    onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'isExclusive', e.target.checked)}
+                                                    style={{ marginRight: '5px' }}
+                                                />
+                                                <label style={{ fontSize: '0.8rem', color: '#c5a059' }}>Visa ENDAST denna rätt detta datum?</label>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
-                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '' })}>+ Rätt</button>
+                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '', specificDate: '', isExclusive: false })}>+ Rätt</button>
 
                             <h4 style={{ marginTop: '20px' }}>Dryck / Barnmeny</h4>
                             {formData.menu?.drinksGroups?.map((dish, i) => (

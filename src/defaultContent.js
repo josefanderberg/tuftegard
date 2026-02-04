@@ -41,6 +41,13 @@ export const defaultContent = {
                 title: "Tuftes Chili con Carne",
                 price: "(Pris pr. pers: 329 kr inkl. dessert)",
                 description: "Serverast i baren med ris, brød, nachoschips og anna deilig tilbehør."
+            },
+            {
+                title: "Fastilavnboller & Semlor",
+                price: "(Pris pr.stk: 65 kr)",
+                description: "Hembakade boller med mandelmassa och grädde. Serveras 12-15.",
+                specificDate: "2026-02-17",
+                isExclusive: true
             }
         ],
         drinksGroups: [

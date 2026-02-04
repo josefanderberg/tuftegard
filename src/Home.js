@@ -337,7 +337,7 @@ const Home = ({ content: propContent }) => {
                 </div>
 
                 <div className="events-grid">
-                    {/* Eksempel Event 1 */}
+                    {/* Event 1: Valentinsmiddag (14 Feb) */}
                     <RevealOnScroll className="event-card">
                         <div className="event-date-large">
                             <span className="day">14</span>
@@ -345,11 +345,30 @@ const Home = ({ content: propContent }) => {
                         </div>
                         <h4>Valentinsmiddag</h4>
                         <p>Ta med din kjære på en romantisk 5-retters meny under stjernene. Levende lys og god stemning.</p>
-                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Bestill Bord</span>
+                        <span onClick={() => {
+                            // Sätt datum till 14 Feb och scrolla
+                            setBookingDate(new Date('2026-02-14T12:00:00'));
+                            scrollToSection('kontakt');
+                        }} className="btn-event">Bestill Bord</span>
                     </RevealOnScroll>
 
-                    {/* Eksempel Event 2 */}
+                    {/* Event 2: Fastilavnboller (17 Feb) */}
                     <RevealOnScroll className="event-card" style={{ transitionDelay: '0.2s' }}>
+                        <div className="event-date-large">
+                            <span className="day">17</span>
+                            <span className="month">Feb</span>
+                        </div>
+                        <h4>Fastilavnboller & Semlor</h4>
+                        <p>Hembakade boller med mandelmassa och grädde. Serveras 12-15.</p>
+                        <span onClick={() => {
+                            // Använd T12:00 för att undvika midnatts-tidszonsproblem
+                            setBookingDate(new Date('2026-02-17T12:00:00'));
+                            scrollToSection('kontakt');
+                        }} className="btn-event">Bestill Bord</span>
+                    </RevealOnScroll>
+
+                    {/* Event 3: Vinskule (20 Mar) */}
+                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.4s' }}>
                         <div className="event-date-large">
                             <span className="day">20</span>
                             <span className="month">Mar</span>
@@ -357,17 +376,6 @@ const Home = ({ content: propContent }) => {
                         <h4>Vinskule & Smaking</h4>
                         <p>Lær om italienske viner med vår sommelier. Smaking av 6 ulike viner med tilhørende småretter.</p>
                         <span onClick={() => scrollToSection('kontakt')} className="btn-event">Meld deg på</span>
-                    </RevealOnScroll>
-
-                    {/* Eksempel Event 3 */}
-                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.4s' }}>
-                        <div className="event-date-large">
-                            <span className="day">10</span>
-                            <span className="month">Apr</span>
-                        </div>
-                        <h4>Vårfest på Låven</h4>
-                        <p>Vi feirer at våren er i anmarsj! Live musikk, dans og grilling av årets første lam.</p>
-                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Les mer</span>
                     </RevealOnScroll>
                 </div>
             </section>
@@ -403,16 +411,37 @@ const Home = ({ content: propContent }) => {
                         <div className="menu-col" style={{ flex: '0 0 100%', maxWidth: '800px' }}>
                             <h4>Hovudrettar</h4>
                             <ul>
-                                {mainCourses.length > 0 ? (
-                                    mainCourses.map((item, index) => (
+                                {(() => {
+                                    // 1. Filtrera fram relevanta rätter för valt datum (eller alla om inget datum valt)
+                                    let relevantDishes = mainCourses.filter(item => {
+                                        if (item.specificDate) {
+                                            if (!bookingDate) return false; // Dölj specifika om inget datum valt
+                                            const y = bookingDate.getFullYear();
+                                            const m = String(bookingDate.getMonth() + 1).padStart(2, '0');
+                                            const d = String(bookingDate.getDate()).padStart(2, '0');
+                                            const selectedDateStr = `${y}-${m}-${d}`;
+                                            return selectedDateStr === item.specificDate;
+                                        }
+                                        return true; // Visa standardrätter preliminärt
+                                    });
+
+                                    // 2. Kolla om någon av de relevanta rätterna är "Exklusiv"
+                                    const exclusiveDish = relevantDishes.find(d => d.isExclusive);
+
+                                    // 3. Om exklusiv finns, visa BARA den/dem. Annars visa alla relevanta.
+                                    const displayedDishes = exclusiveDish
+                                        ? relevantDishes.filter(d => d.isExclusive)
+                                        : relevantDishes;
+
+                                    if (displayedDishes.length === 0) return <p>Inga rätter tillgängliga.</p>;
+
+                                    return displayedDishes.map((item, index) => (
                                         <li key={index}>
                                             <strong>{item.title} {item.price && <span>{item.price}</span>}</strong>
                                             <span>{item.description}</span>
                                         </li>
-                                    ))
-                                ) : (
-                                    <p>Inga rätter tillgängliga.</p>
-                                )}
+                                    ));
+                                })()}
                             </ul>
                         </div>
                     </div>
@@ -508,15 +537,38 @@ const Home = ({ content: propContent }) => {
                         <div style={{ margin: '30px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', padding: '20px 0', textAlign: 'left' }}>
                             <h4 style={{ marginBottom: '15px', color: '#c5a059', textAlign: 'center' }}>Velg Menyer</h4>
                             <p style={{ fontSize: '0.9rem', color: '#777', marginBottom: '20px', textAlign: 'center' }}>Vennligst oppgi antall på hver rett som ønskes servert til selskapet.</p>
-                            {mainCourses.map((dish, index) => (
-                                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                    <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>
-                                        {dish.title}
-                                        {dish.price && <span style={{ display: 'block', fontSize: '0.8em', color: '#999', fontWeight: 'normal' }}>{dish.price}</span>}
-                                    </label>
-                                    <input type="number" min="0" placeholder="0" style={{ width: '80px', height: '40px', padding: '5px', textAlign: 'center' }} onChange={(e) => handleDishCountChange(dish.title, e.target.value)} />
-                                </div>
-                            ))}
+                            {(() => {
+                                // 1. Filtrera fram relevanta rätter
+                                let relevantDishes = mainCourses.filter(item => {
+                                    if (item.specificDate) {
+                                        if (!bookingDate) return false;
+                                        const y = bookingDate.getFullYear();
+                                        const m = String(bookingDate.getMonth() + 1).padStart(2, '0');
+                                        const d = String(bookingDate.getDate()).padStart(2, '0');
+                                        const selectedDateStr = `${y}-${m}-${d}`;
+                                        return selectedDateStr === item.specificDate;
+                                    }
+                                    return true;
+                                });
+
+                                // 2. Kolla efter exklusive
+                                const exclusiveDish = relevantDishes.find(d => d.isExclusive);
+
+                                // 3. Välj rätter att visa
+                                const displayedDishes = exclusiveDish
+                                    ? relevantDishes.filter(d => d.isExclusive)
+                                    : relevantDishes;
+
+                                return displayedDishes.map((dish, index) => (
+                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                        <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>
+                                            {dish.title}
+                                            {dish.price && <span style={{ display: 'block', fontSize: '0.8em', color: '#999', fontWeight: 'normal' }}>{dish.price}</span>}
+                                        </label>
+                                        <input type="number" min="0" placeholder="0" style={{ width: '80px', height: '40px', padding: '5px', textAlign: 'center' }} onChange={(e) => handleDishCountChange(dish.title, e.target.value)} />
+                                    </div>
+                                ));
+                            })()}
                         </div>
 
                         <textarea placeholder="Har de spesielle ønskjer, allergiar eller vil du reservere For de minste-alternativet?" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
