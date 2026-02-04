@@ -156,7 +156,7 @@ const Home = ({ content: propContent }) => {
     };
 
     const galleryImages = [
-        '/tufte18.png', '/tufte19.png', '/tufte6.png', '/tufte1.png', '/tufte8.png',
+        '/tufte18.png', '/tufte19.png', '/tufte20.png', '/tufte6.png', '/tufte1.png', '/tufte8.png',
         '/tufte9.png', '/tufte10.png', '/tufte11.png', '/tufte12.png',
         '/tufte14.png', '/tufte15.png', '/tufte16.png', '/tufte17.png', '/tufte13.png'
     ];
@@ -582,15 +582,15 @@ const Home = ({ content: propContent }) => {
                 <div className="section-header">
                     <h3>Finn frem</h3>
                 </div>
-                <div className="map-container">
+                <div className="map-container" style={{ height: '500px' }}>
                     <iframe
                         width="100%"
-                        height="400"
+                        height="100%"
                         frameBorder="0"
                         scrolling="no"
                         marginHeight="0"
                         marginWidth="0"
-                        src="https://maps.google.com/maps?width=100%25&height=400&hl=en&q=Tufte%20G%C3%A5rd,%20cafe%20og%20g%C3%A5rdsutsalg,%20Fensvegen%20157,%203830%20Ulefoss,%20Norge&t=&z=14&ie=UTF8&iwloc=B&output=embed"
+                        src="https://maps.google.com/maps?width=100%25&height=500&hl=en&q=Tufte%20G%C3%A5rd,%20Ulefoss&t=&z=14&ie=UTF8&iwloc=B&output=embed"
                         title="Tufte Gård Map"
                     ></iframe>
                 </div>

@@ -156,7 +156,7 @@ button {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100svh;
   background-size: cover;
   background-position: center;
   z-index: -1;
@@ -167,7 +167,7 @@ button {
 
 /* --- HERO --- */
 .hero {
-  height: 100dvh;
+  height: 100svh;
   /* Modern standard som hanterar mobila adressfält bättre */
   /* VIKTIGT: Tar bort bakgrundsstilar härifrån och gör bakgrunden transparent */
   background: transparent;
@@ -654,7 +654,7 @@ button {
 
 /* --- MAP SECTION --- */
 .map-section {
-  padding: 80px 20px 0 20px;
+  padding: 80px 0 0 0;
   background-color: var(--light);
   text-align: center;
 }
@@ -662,10 +662,11 @@ button {
 .map-container {
   max-width: 1000px;
   margin: 40px auto 0;
-  border-radius: 2px;
-  overflow: hidden;
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 0;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  height: 400px;
+  height: 500px;
 }
 
 .map-container iframe {
