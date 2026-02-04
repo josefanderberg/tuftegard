@@ -578,6 +578,23 @@ const Home = ({ content: propContent }) => {
                     <p className="booking-info">{content.booking.contactInfo}</p>
                 </div>
             </section>
+            <section id="hitta-hit" className="map-section">
+                <div className="section-header">
+                    <h3>Finn frem</h3>
+                </div>
+                <div className="map-container">
+                    <iframe
+                        width="100%"
+                        height="400"
+                        frameBorder="0"
+                        scrolling="no"
+                        marginHeight="0"
+                        marginWidth="0"
+                        src="https://maps.google.com/maps?width=100%25&height=400&hl=en&q=Tufte%20G%C3%A5rd,%20cafe%20og%20g%C3%A5rdsutsalg,%20Fensvegen%20157,%203830%20Ulefoss,%20Norge&t=&z=14&ie=UTF8&iwloc=B&output=embed"
+                        title="Tufte Gård Map"
+                    ></iframe>
+                </div>
+            </section>
             <footer className="footer">
                 <div className="footer-content">
                     <div className="social-links">
