@@ -74,6 +74,10 @@ const Admin = ({ content, onSave }) => {
                 standardTimes: content.booking?.standardTimes || ["18:00"],
                 sundayTimes: content.booking?.sundayTimes || ["15:00"]
             },
+            gallery: {
+                ...content.gallery,
+                images: content.gallery?.images || defaultContent.gallery.images || []
+            },
             confirmationPopup: {
                 ...defaultContent.confirmationPopup,
                 ...content.confirmationPopup
@@ -300,15 +304,20 @@ const Admin = ({ content, onSave }) => {
     };
     const handleObjectArrayChange = (section, listKey, index, fieldKey, value) => {
         setFormData(prev => {
-            // Handle top-level array (e.g. 'events')
+            // Handle top-level array
             if (listKey === null) {
                 const newArray = [...(prev[section] || [])];
-                newArray[index] = { ...newArray[index], [fieldKey]: value };
+                if (newArray[index]) {
+                    newArray[index] = { ...newArray[index], [fieldKey]: value };
+                }
                 return { ...prev, [section]: newArray };
             }
-            // Handle nested array (e.g. menu.mainCourses)
-            const newList = [...prev[section][listKey]];
-            newList[index] = { ...newList[index], [fieldKey]: value };
+            // Handle nested array
+            const currentList = prev[section]?.[listKey] || [];
+            const newList = [...currentList];
+            if (newList[index]) {
+                newList[index] = { ...newList[index], [fieldKey]: value };
+            }
             return {
                 ...prev,
                 [section]: {
@@ -323,7 +332,14 @@ const Admin = ({ content, onSave }) => {
             if (listKey === null) {
                 return { ...prev, [section]: [...(prev[section] || []), newItem] };
             }
-            return { ...prev, [section]: { ...prev[section], [listKey]: [...prev[section][listKey], newItem] } };
+            const currentList = prev[section]?.[listKey] || [];
+            return {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [listKey]: [...currentList, newItem]
+                }
+            };
         });
     };
     const handleDeleteItem = (section, listKey, index) => {
@@ -334,9 +350,62 @@ const Admin = ({ content, onSave }) => {
                 newArray.splice(index, 1);
                 return { ...prev, [section]: newArray };
             }
-            const newList = formData[section][listKey].filter((_, i) => i !== index);
-            return { ...prev, [section]: { ...prev[section], [listKey]: newList } };
+            const currentList = prev[section]?.[listKey] || [];
+            const newList = currentList.filter((_, i) => i !== index);
+            return {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [listKey]: newList
+                }
+            };
         });
+    };
+
+    const handleMoveItem = (section, listKey, index, direction) => {
+        setFormData(prev => {
+            const list = listKey ? (prev[section]?.[listKey] || []) : (prev[section] || []);
+            if (direction === -1 && index === 0) return prev; // Can't move up
+            if (direction === 1 && index === list.length - 1) return prev; // Can't move down
+
+            const newList = [...list];
+            const temp = newList[index];
+            newList[index] = newList[index + direction];
+            newList[index + direction] = temp;
+
+            if (listKey) {
+                return {
+                    ...prev,
+                    [section]: {
+                        ...prev[section],
+                        [listKey]: newList
+                    }
+                };
+            } else {
+                return {
+                    ...prev,
+                    [section]: newList
+                };
+            }
+        });
+    };
+
+    const handleImageUpload = (e, section, listKey) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) { // 2MB limit check
+            alert("Filen är för stor (Max 2MB). Försök komprimera den först.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            // Create new image object
+            const newImage = { url: reader.result, category: 'vinter' }; // Default to vinter
+            handleAddItem(section, listKey, newImage);
+        };
+        reader.readAsDataURL(file);
     };
     const handleArrayChange = (section, key, index, value) => {
         const newArray = [...formData[section][key]];
@@ -787,10 +856,78 @@ const Admin = ({ content, onSave }) => {
                         </div>
 
                         <div className="group-box">
+                            <h3>Bokningstext (Kontakt / Formulär)</h3>
+                            <Input label="Rubrik" value={formData.booking?.title} onChange={(e) => handleChange('booking', 'title', e.target.value)} />
+                            <TextArea label="Underrubrik / Intro" value={formData.booking?.subtitle} onChange={(e) => handleChange('booking', 'subtitle', e.target.value)} />
+                            <TextArea label="Kontaktinfo (Botten)" value={formData.booking?.contactInfo} onChange={(e) => handleChange('booking', 'contactInfo', e.target.value)} />
+                        </div>
+
+                        <div className="group-box">
                             <h3>Bekräftelse Popup (Efter bokning)</h3>
                             <Input label="Rubrik" value={formData.confirmationPopup?.title} onChange={(e) => handleChange('confirmationPopup', 'title', e.target.value)} />
                             <TextArea label="Meddelande Rad 1" value={formData.confirmationPopup?.message1} onChange={(e) => handleChange('confirmationPopup', 'message1', e.target.value)} />
                             <TextArea label="Meddelande Rad 2" value={formData.confirmationPopup?.message2} onChange={(e) => handleChange('confirmationPopup', 'message2', e.target.value)} />
+                        </div>
+
+                        <div className="group-box">
+                            <h3>Galleri / Bilder</h3>
+                            <Input label="Rubrik" value={formData.gallery?.title} onChange={(e) => handleChange('gallery', 'title', e.target.value)} />
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px', marginTop: '15px' }}>
+                                {formData.gallery?.images?.map((img, i) => (
+                                    <div key={i} style={{ background: '#222', padding: '10px', borderRadius: '4px', border: '1px solid #444', display: 'flex', flexDirection: 'column' }}>
+                                        <div style={{ height: '100px', overflow: 'hidden', marginBottom: '10px', borderRadius: '2px', position: 'relative' }}>
+                                            <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <div style={{ position: 'absolute', top: 0, right: 0, display: 'flex', gap: '2px', background: 'rgba(0,0,0,0.5)' }}>
+                                                <button onClick={() => handleMoveItem('gallery', 'images', i, -1)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}>⬆️</button>
+                                                <button onClick={() => handleMoveItem('gallery', 'images', i, 1)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}>⬇️</button>
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '5px' }}>
+                                            <label style={{ fontSize: '0.7rem', color: '#aaa' }}>Kategori</label>
+                                            <select
+                                                value={img.category || 'vinter'}
+                                                onChange={(e) => handleObjectArrayChange('gallery', 'images', i, 'category', e.target.value)}
+                                                style={{ width: '100%', padding: '5px', background: '#333', color: '#fff', border: '1px solid #555', fontSize: '0.8rem' }}
+                                            >
+                                                <option value="vinter">Vinter</option>
+                                                <option value="sommar">Sommar</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '5px' }}>
+                                            <label style={{ fontSize: '0.7rem', color: '#aaa' }}>URL</label>
+                                            <input
+                                                value={img.url}
+                                                onChange={(e) => handleObjectArrayChange('gallery', 'images', i, 'url', e.target.value)}
+                                                style={{ width: '100%', padding: '5px', background: '#333', color: '#fff', border: '1px solid #555', fontSize: '0.8rem' }}
+                                            />
+                                        </div>
+                                        <button onClick={() => handleDeleteItem('gallery', 'images', i)} style={{ width: '100%', padding: '5px', background: '#d32f2f', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.8rem', marginTop: 'auto' }}>Ta bort</button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{ marginTop: '20px', padding: '15px', background: '#2a2a2a', borderRadius: '4px' }}>
+                                <label style={{ display: 'block', marginBottom: '10px', color: '#c5a059', fontWeight: 'bold' }}>Ladda upp ny bild</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleImageUpload(e, 'gallery', 'images')}
+                                    style={{ display: 'block', width: '100%', marginBottom: '10px', color: '#fff' }}
+                                />
+                                <p style={{ fontSize: '0.8rem', color: '#888' }}>
+                                    (Max 2MB per bild. Bilden sparas direkt i hemsidans databas.)
+                                </p>
+                            </div>
+
+                            <div style={{ marginTop: '10px', textAlign: 'center', color: '#888' }}>ELLER</div>
+
+                            <button
+                                onClick={() => handleAddItem('gallery', 'images', { url: '', category: 'vinter' })}
+                                style={{ marginTop: '10px', padding: '10px', background: '#444', color: '#ccc', border: 'none', cursor: 'pointer', width: '100%' }}
+                            >
+                                + Lägg till tom bild-ruta (för URL)
+                            </button>
                         </div>
                     </div>
 

@@ -89,7 +89,10 @@ const Home = ({ content: propContent }) => {
 
     // --- EFFEKTER ---
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 50);
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+            setMenuOpen(false); // Stäng menyn vid scroll
+        };
         window.addEventListener('scroll', handleScroll);
 
         // HÄMTA FULLBOKADE DATUM PÅ LOAD
@@ -155,14 +158,18 @@ const Home = ({ content: propContent }) => {
         }
     };
 
-    const galleryImages = [
-        '/tufte18.png', '/tufte19.png', '/tufte20.png', '/tufte6.png', '/tufte1.png', '/tufte8.png',
-        '/tufte9.png', '/tufte10.png', '/tufte11.png', '/tufte12.png',
-        '/tufte14.png', '/tufte15.png', '/tufte16.png', '/tufte17.png', '/tufte13.png'
-    ];
+    const [galleryFilter, setGalleryFilter] = useState('vinter');
+
+    const allGalleryImages = content.gallery?.images || [];
+    const displayedGalleryImages = allGalleryImages.filter(img => {
+        // Om ingen kategori är satt, visa alltid (eller default sommar/vinter?)
+        // Här antar vi att filtret matchar kategori-strängen.
+        if (!img.category) return true;
+        return img.category === galleryFilter;
+    });
 
     const showMoreImages = () => {
-        setVisibleImagesCount(galleryImages.length);
+        setVisibleImagesCount(displayedGalleryImages.length);
     };
 
     const handleDishCountChange = (dishTitle, count) => {
@@ -377,18 +384,50 @@ const Home = ({ content: propContent }) => {
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
                     <h3>{content.gallery.title}</h3>
+                    <div className="gallery-filter-buttons" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => { setGalleryFilter('sommar'); setVisibleImagesCount(6); }}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: galleryFilter === 'sommar' ? '2px solid #c5a059' : '2px solid transparent',
+                                color: galleryFilter === 'sommar' ? '#000' : '#888',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                paddingBottom: '5px'
+                            }}
+                        >
+                            SOMMER
+                        </button>
+                        <button
+                            onClick={() => { setGalleryFilter('vinter'); setVisibleImagesCount(6); }}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: galleryFilter === 'vinter' ? '2px solid #c5a059' : '2px solid transparent',
+                                color: galleryFilter === 'vinter' ? '#000' : '#888',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                paddingBottom: '5px'
+                            }}
+                        >
+                            VINTER
+                        </button>
+                    </div>
                 </div>
                 <div className="masonry-grid">
-                    {galleryImages.slice(0, visibleImagesCount).map((img, index) => (
+                    {displayedGalleryImages.slice(0, visibleImagesCount).map((imgObj, index) => (
                         <div key={index} className="masonry-item">
-                            <img src={img} alt={`Stemningsbilde ${index + 1}`} />
+                            <img src={imgObj.url} alt={`Stemningsbilde ${index + 1}`} />
                         </div>
                     ))}
                 </div>
-                {visibleImagesCount < galleryImages.length && (
+                {visibleImagesCount < displayedGalleryImages.length && (
                     <div className="gallery-button-container">
                         <button onClick={showMoreImages} className="btn-outline">
-                            Se flere bilete ({galleryImages.length - visibleImagesCount} til)
+                            Se flere bilder ({displayedGalleryImages.length - visibleImagesCount} til)
                         </button>
                     </div>
                 )}
@@ -444,12 +483,12 @@ const Home = ({ content: propContent }) => {
 
             <section id="kontakt" className="booking-section">
                 <div className="booking-container">
-                    <h3>{content.booking.title}</h3>
-                    <p>{content.booking.subtitle}</p>
+                    <h3>{content.booking?.title}</h3>
+                    <p>{content.booking?.subtitle}</p>
 
                     <form className="booking-form" onSubmit={handleSubmitBooking}>
                         <div className="input-grid-row">
-                            <input type="text" placeholder="Ditt namn" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                            <input type="text" placeholder="Ditt navn" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                             <div className="phone-input-wrapper">
                                 <PhoneInput
                                     country={'no'}
@@ -528,7 +567,7 @@ const Home = ({ content: propContent }) => {
                         </div>
 
                         <div style={{ margin: '30px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', padding: '20px 0', textAlign: 'left' }}>
-                            <h4 style={{ marginBottom: '15px', color: '#c5a059', textAlign: 'center' }}>Velg Menyer</h4>
+                            <h4 style={{ marginBottom: '15px', color: '#c5a059', textAlign: 'center' }}>Velg rett</h4>
                             <p style={{ fontSize: '0.9rem', color: '#777', marginBottom: '20px', textAlign: 'center' }}>Vennligst oppgi antall på hver rett som ønskes servert til selskapet.</p>
                             {(() => {
                                 // 1. Filtrera fram relevanta rätter
@@ -564,9 +603,9 @@ const Home = ({ content: propContent }) => {
                             })()}
                         </div>
 
-                        <textarea placeholder="Har de spesielle ønskjer, allergiar eller vil du reservere For de minste-alternativet?" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
+                        <textarea placeholder="Har du allergener eller andre ønsker? Legg igjen en kommentar." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
 
-                        <button type="submit" disabled={submitting}>{submitting ? "Sender..." : "Send Førespurnad"}</button>
+                        <button type="submit" disabled={submitting}>{submitting ? "Sender..." : "Send forespørsel"}</button>
                     </form>
                     <p className="booking-info">{content.booking.contactInfo}</p>
                 </div>

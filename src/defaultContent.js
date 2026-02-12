@@ -47,7 +47,24 @@ export const defaultContent = {
         }
     ],
     gallery: {
-        title: "Øyeblikk fra gården"
+        title: "Øyeblikk fra gården",
+        images: [
+            { url: '/tufte18.png', category: 'vinter' },
+            { url: '/tufte19.png', category: 'vinter' },
+            { url: '/tufte20.png', category: 'sommar' },
+            { url: '/tufte6.png', category: 'sommar' },
+            { url: '/tufte1.png', category: 'sommar' },
+            { url: '/tufte8.png', category: 'vinter' },
+            { url: '/tufte9.png', category: 'sommar' },
+            { url: '/tufte10.png', category: 'sommar' },
+            { url: '/tufte11.png', category: 'vinter' },
+            { url: '/tufte12.png', category: 'sommar' },
+            { url: '/tufte14.png', category: 'sommar' },
+            { url: '/tufte15.png', category: 'sommar' },
+            { url: '/tufte16.png', category: 'sommar' },
+            { url: '/tufte17.png', category: 'sommar' },
+            { url: '/tufte13.png', category: 'sommar' }
+        ]
     },
     menu: {
         label: "Sesongens Oppleving",
@@ -91,8 +108,8 @@ export const defaultContent = {
         ]
     },
     booking: {
-        title: "Reserver di oppleving",
-        subtitle: "Sidan me lagar maten basert på antal gjester, set me pris på bestilling i forkant.",
+        title: "Reserver din opplevelse!",
+        subtitle: "Siden vi lager maten basert på antall gjester, setter vi pris på bestilling på forhånd.",
         contactInfo: "Du kan også ta kontakt på Tufte Gård Messenger eller tlf: 46824498 for booking og spørsmål.",
         timeSlots: [
             "14:00 - 17:00",
@@ -105,7 +122,7 @@ export const defaultContent = {
         message2: "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."
     },
     footer: {
-        text: "Tufte Gård © 2025 | Der matkultur møter natur"
+        text: "Tufte Gård © 2026 | Midt i morellhagen"
     },
     calendar: {
         openDates: [
