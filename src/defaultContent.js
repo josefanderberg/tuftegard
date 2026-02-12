@@ -6,13 +6,13 @@ export const defaultContent = {
         buttonText: "Opplev Atmosfæren"
     },
     intro: {
-        label: "Vår Filosofi",
-        title: "Opplevinga på Tufte",
-        description: "Me har store draumar for framtida. Planen er å bygge om låven til restaurant, auke morellproduksjonen og fortsette å spreie matglede og unike naturopplevingar i godt selskap.",
-        gardenTitle: "Garden",
-        gardenText: "Me har henta inspirasjon frå dei italienske vinlundane, der måltidet nytast midt i råvarene. Hos oss spring du ikkje rundt – du landar. Du finn roen. Her sit du midt i morellhagen, omkransa av naturen.",
-        foodTitle: "Maten",
-        foodText: "Maten vår er ærleg og laga med kjærleik over open eld. Om sommaren nyt du friske smakar under blå himmel, og om vinteren varmar me oss kring store bålpanner medan dufta av grillmat stig mot stjernene."
+        label: "Tufte Gård",
+        mainTitle: "Om oss",
+        mainDescription: "Tufte Gård er en familiedrevet morellgård og kafé – midt blant trær, folk og gode smaker.\n\nHer blomstrer morelltrærne om våren, og om sommeren fylles grenene av røde, søte bær.\n\nMange sier det minner om vinrankene i Italia eller Frankrike – vi liker å tro det er litt av den samme følelsen: det gode liv, enkelt og ekte.",
+        gardenTitle: "Stemninga",
+        gardenText: "Hos oss handler det ikke om å skynde seg videre.\n\nOm sommeren sitter du i morellhagen og nyter deilig mat og drikke under åpen himmel \nOm vinteren samles vi rundt bålpanner, pakket inn i ullpledd, med varme smaker og glør som knitrer i mørket.\n\nVi ønsker å skape et sted for hygge og nærhet – et sted der du kan senke skuldrene og bare være.",
+        foodTitle: "Mat og Drikke",
+        foodText: "Vi serverer mat med røtter i det norske og svenske kjøkkenet, inspirert av det italienske kjøkkenets enkelhet og varme. Sesongen får sette smaken.\n\nDrikkene våre bygger på det vi har rundt oss: egne moreller, rabarbra, bær og fantastiske lokale produkter.\n\nNår du kommer hit, håper vi du føler deg hjemme – enten det er første gang, eller du kommer tilbake igjen."
     },
     winter: {
         label: "Vinter: Nytt Konsept",
@@ -20,9 +20,34 @@ export const defaultContent = {
         textPart1: "Velkommen til Tufte Gård rundt bålpanna. Me gleder oss stort til å introdusere vårt nye vinterkonsept. Frå romjulen kan du og gjengen booke deires egen bålpanne (min. 4 personer) og nyte ein koselig stund under åpen himmel – med god mat, lune tepper og ekte vinterstemning.",
         textPart2: "Me starter opp i romjulen, og planlegger å holde åpent kvar helg framover. Sikre deg plass ved bålpanna ved å ta kontakt!"
     },
+    events: [
+        {
+            id: 1,
+            title: "Valentinsmiddag",
+            date: "14. Feb",
+            description: "Romantisk middag for to med levande lys og kjærleik på menyen.",
+            bookingDate: "2025-02-14",
+            imageUrl: "/tufte11.png"
+        },
+        {
+            id: 2,
+            title: "Fastelavnboller",
+            date: "2. Mars",
+            description: "Vi serverar våre berømte fastelavnsboller med heimelaga syltetøy og krem.",
+            bookingDate: "2025-03-02",
+            imageUrl: "/tufte8.png"
+        },
+        {
+            id: 3,
+            title: "Vinskule",
+            date: "15. Mars",
+            description: "Lær om vinens verden med vår sommelier. Smaking av 5 ulike viner.",
+            bookingDate: "2025-03-15",
+            imageUrl: "/tufte3.png"
+        }
+    ],
     gallery: {
-        title: "Augneblink frå garden",
-        subtitle: "Mat, menneske og natur i samspel."
+        title: "Øyeblikk fra gården"
     },
     menu: {
         label: "Sesongens Oppleving",

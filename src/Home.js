@@ -265,7 +265,7 @@ const Home = ({ content: propContent }) => {
                         <span className="bar"></span><span className="bar"></span><span className="bar"></span>
                     </button>
                     <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
-                        <button onClick={() => scrollToSection('arrangemant')}>Arrangemant</button>
+                        <button onClick={() => scrollToSection('arrangemant')}>Arrangement</button>
                         <button onClick={() => scrollToSection('galleri')}>Galleri</button>
                         <button onClick={() => scrollToSection('meny')}>Mat & Drikke</button>
                         <button onClick={() => scrollToSection('kontakt')} className="btn-book">Bestill Bålpanne</button>
@@ -278,16 +278,20 @@ const Home = ({ content: propContent }) => {
                     <span className="subtitle">{content.hero.subtitle}</span>
                     <h2>{content.hero.title}</h2>
                     <p>{content.hero.description}</p>
-                    <button className="btn-primary" onClick={() => scrollToSection('arrangemant')}>{content.hero.buttonText}</button>
+                    <button className="btn-primary" onClick={() => scrollToSection('vinter')}>Opplev Sesongens Tilbud</button>
                 </div>
             </section>
 
 
 
             {/* --- SEKTION 1: INTRO / FILOSOFI (Only Label + Symbol) --- */}
-            <section className="text-center" style={{ padding: '80px 20px 40px', backgroundColor: '#fff', position: 'relative', zIndex: 1 }}>
-                <span className="label" style={{ marginBottom: '5px' }}>{content.intro.label}</span>
-                <div className="divider" style={{ marginTop: '10px' }}>❦</div>
+            {/* --- SEKTION 1: INTRO / FILOSOFI (Only Label + Symbol) --- */}
+            <section className="text-center" style={{ padding: '80px 20px 40px', backgroundColor: '#fff', position: 'relative', zIndex: 1, width: '100%' }}>
+                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    <span className="label" style={{ marginBottom: '20px', display: 'block' }}>{content.intro.mainTitle}</span>
+                    <p style={{ whiteSpace: 'pre-line' }}>{content.intro.mainDescription}</p>
+                    <div className="divider" style={{ marginTop: '30px' }}>🍒</div>
+                </div>
             </section>
 
             {/* --- SEKTION 2: GARDEN (Bild Vänster / Text Höger) --- */}
@@ -296,9 +300,8 @@ const Home = ({ content: propContent }) => {
                     {/* Bild Container */}
                 </RevealOnScroll>
                 <RevealOnScroll className="split-content slide-right">
-                    <span className="label">Omgivnadene</span>
-                    <h4>{content.intro.gardenTitle}</h4>
-                    <p>{content.intro.gardenText}</p>
+                    <span className="label">{content.intro.gardenTitle}</span>
+                    <p style={{ whiteSpace: 'pre-line' }}>{content.intro.gardenText}</p>
                 </RevealOnScroll>
             </div>
 
@@ -308,82 +311,72 @@ const Home = ({ content: propContent }) => {
                     {/* Bild Container */}
                 </RevealOnScroll>
                 <RevealOnScroll className="split-content slide-left">
-                    <span className="label">Det Kulinariske</span>
-                    <h4>{content.intro.foodTitle}</h4>
-                    <p>{content.intro.foodText}</p>
+                    <span className="label">{content.intro.foodTitle}</span>
+                    <p style={{ whiteSpace: 'pre-line' }}>{content.intro.foodText}</p>
                 </RevealOnScroll>
             </div>
 
             {/* --- SEKTION 4: VINTER/STÄMNING (Bild Vänster / Text Höger) --- */}
-            <div id="arrangemant" className="split-section">
+            <div id="vinter" className="split-section">
                 <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte3.png')" }}>
                     {/* Bild Container */}
                 </RevealOnScroll>
                 <RevealOnScroll className="split-content slide-right">
-                    <span className="label">{content.winter.label}</span>
-                    <h3>{content.winter.title}</h3>
-                    <p><strong>{content.winter.textPart1.split('.')[0] + '.'}</strong> {content.winter.textPart1.split('.').slice(1).join('.')}</p>
-                    <p>{content.winter.textPart2}</p>
+                    <span className="label">{content.winter.title}</span>
+                    <p style={{ whiteSpace: 'pre-line' }}>{content.winter.textPart1}</p>
+                    <p style={{ whiteSpace: 'pre-line' }}>{content.winter.textPart2}</p>
+                    <button className="btn-primary" style={{ marginTop: '40px', alignSelf: 'center' }} onClick={() => scrollToSection('kontakt')}>Bestill Bålpanne</button>
                 </RevealOnScroll>
 
             </div>
 
             {/* --- KOMMENDE ARRANGEMANG --- */}
-            <section className="events-section">
+            <section id="arrangemant" className="events-section">
                 <div className="section-header">
-                    <span className="label">Det skjer på garden</span>
-                    <h3>Kommende Arrangemang</h3>
+                    <span className="label">Dette skjer på gården</span>
+                    <h3>Kommende Arrangemeng</h3>
                     <p>Sett av datoen for våre spesielle kvelder.</p>
                 </div>
 
                 <div className="events-grid">
-                    {/* Event 1: Valentinsmiddag (14 Feb) */}
-                    <RevealOnScroll className="event-card">
-                        <div className="event-date-large">
-                            <span className="day">14</span>
-                            <span className="month">Feb</span>
-                        </div>
-                        <h4>Valentinsmiddag</h4>
-                        <p>Ta med din kjære på en romantisk 5-retters meny under stjernene. Levende lys og god stemning.</p>
-                        <span onClick={() => {
-                            // Sätt datum till 14 Feb och scrolla
-                            setBookingDate(new Date('2026-02-14T12:00:00'));
-                            scrollToSection('kontakt');
-                        }} className="btn-event">Bestill Bord</span>
-                    </RevealOnScroll>
-
-                    {/* Event 2: Fastilavnboller (17 Feb) */}
-                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.2s' }}>
-                        <div className="event-date-large">
-                            <span className="day">17</span>
-                            <span className="month">Feb</span>
-                        </div>
-                        <h4>Fastilavnboller & Semlor</h4>
-                        <p>Hembakade boller med mandelmassa och grädde. Serveras 12-15.</p>
-                        <span onClick={() => {
-                            // Använd T12:00 för att undvika midnatts-tidszonsproblem
-                            setBookingDate(new Date('2026-02-17T12:00:00'));
-                            scrollToSection('kontakt');
-                        }} className="btn-event">Bestill Bord</span>
-                    </RevealOnScroll>
-
-                    {/* Event 3: Vinskule (20 Mar) */}
-                    <RevealOnScroll className="event-card" style={{ transitionDelay: '0.4s' }}>
-                        <div className="event-date-large">
-                            <span className="day">20</span>
-                            <span className="month">Mar</span>
-                        </div>
-                        <h4>Vinskule & Smaking</h4>
-                        <p>Lær om italienske viner med vår sommelier. Smaking av 6 ulike viner med tilhørende småretter.</p>
-                        <span onClick={() => scrollToSection('kontakt')} className="btn-event">Meld deg på</span>
-                    </RevealOnScroll>
+                    {(content.events || []).filter(e => !e.hidden).map((event, index) => (
+                        <RevealOnScroll className="event-card" key={index} style={{ transitionDelay: `${index * 0.2}s` }}>
+                            <div className="event-date-large">
+                                <span className="day">{event.date?.split('.')[0] || '14'}</span>
+                                <span className="month">{event.date?.split('.')[1] || 'Feb'}</span>
+                            </div>
+                            <h4>{event.title}</h4>
+                            <p>{event.description}</p>
+                            <span
+                                onClick={() => {
+                                    if (event.bookingDate) {
+                                        setBookingDate(new Date(`${event.bookingDate}T12:00:00`));
+                                    }
+                                    scrollToSection('kontakt');
+                                }}
+                                className="btn-event"
+                            >
+                                Bestill Bord
+                            </span>
+                        </RevealOnScroll>
+                    ))}
+                    {(!content.events || (content.events.filter(e => !e.hidden).length === 0)) && (
+                        <RevealOnScroll className="event-card" style={{ gridColumn: '1/-1', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+                            <div className="event-date-large" style={{ opacity: 0.5 }}>
+                                <span className="day">--</span>
+                                <span className="month">--</span>
+                            </div>
+                            <h4>Inga planlagde arrangement</h4>
+                            <p>Akkurat no har me ingen fastsette datoar, men følg med – det kjem meir!</p>
+                            <span onClick={() => scrollToSection('kontakt')} className="btn-event">Ta kontakt for spørsmål</span>
+                        </RevealOnScroll>
+                    )}
                 </div>
             </section>
 
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
                     <h3>{content.gallery.title}</h3>
-                    <p>{content.gallery.subtitle}</p>
                 </div>
                 <div className="masonry-grid">
                     {galleryImages.slice(0, visibleImagesCount).map((img, index) => (
@@ -409,7 +402,7 @@ const Home = ({ content: propContent }) => {
                     <p className="menu-intro">{content.menu.intro}</p>
                     <div className="menu-columns" style={{ justifyContent: 'center' }}>
                         <div className="menu-col" style={{ flex: '0 0 100%', maxWidth: '800px' }}>
-                            <h4>Hovudrettar</h4>
+                            <h4 style={{ marginTop: '-2rem', marginBottom: '3rem' }}></h4>
                             <ul>
                                 {(() => {
                                     // 1. Filtrera fram relevanta rätter för valt datum (eller alla om inget datum valt)

@@ -3,6 +3,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from './firebase';
 import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, where, limit, startAfter, updateDoc } from 'firebase/firestore';
+import { defaultContent } from './defaultContent';
 
 // Importera svenska för att få måndag som första dag (Söndag längst till höger)
 import sv from 'date-fns/locale/sv';
@@ -64,6 +65,7 @@ const Admin = ({ content, onSave }) => {
                 mainCourses: content.menu.mainCourses || [],
                 drinksGroups: content.menu.drinksGroups || []
             },
+            events: content.events || [], // Init events array
             calendar: {
                 openDates: content.calendar?.openDates || []
             },
@@ -71,6 +73,10 @@ const Admin = ({ content, onSave }) => {
                 ...content.booking,
                 standardTimes: content.booking?.standardTimes || ["18:00"],
                 sundayTimes: content.booking?.sundayTimes || ["15:00"]
+            },
+            confirmationPopup: {
+                ...defaultContent.confirmationPopup,
+                ...content.confirmationPopup
             }
         }));
     }, [content]);
@@ -293,17 +299,44 @@ const Admin = ({ content, onSave }) => {
         setFormData(prev => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
     };
     const handleObjectArrayChange = (section, listKey, index, fieldKey, value) => {
-        const newList = [...formData[section][listKey]];
-        newList[index] = { ...newList[index], [fieldKey]: value };
-        setFormData(prev => ({ ...prev, [section]: { ...prev[section], [listKey]: newList } }));
+        setFormData(prev => {
+            // Handle top-level array (e.g. 'events')
+            if (listKey === null) {
+                const newArray = [...(prev[section] || [])];
+                newArray[index] = { ...newArray[index], [fieldKey]: value };
+                return { ...prev, [section]: newArray };
+            }
+            // Handle nested array (e.g. menu.mainCourses)
+            const newList = [...prev[section][listKey]];
+            newList[index] = { ...newList[index], [fieldKey]: value };
+            return {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [listKey]: newList
+                }
+            };
+        });
     };
     const handleAddItem = (section, listKey, newItem) => {
-        setFormData(prev => ({ ...prev, [section]: { ...prev[section], [listKey]: [...prev[section][listKey], newItem] } }));
+        setFormData(prev => {
+            if (listKey === null) {
+                return { ...prev, [section]: [...(prev[section] || []), newItem] };
+            }
+            return { ...prev, [section]: { ...prev[section], [listKey]: [...prev[section][listKey], newItem] } };
+        });
     };
     const handleDeleteItem = (section, listKey, index) => {
         if (!window.confirm("Ta bort?")) return;
-        const newList = formData[section][listKey].filter((_, i) => i !== index);
-        setFormData(prev => ({ ...prev, [section]: { ...prev[section], [listKey]: newList } }));
+        setFormData(prev => {
+            if (listKey === null) {
+                const newArray = [...(prev[section] || [])];
+                newArray.splice(index, 1);
+                return { ...prev, [section]: newArray };
+            }
+            const newList = formData[section][listKey].filter((_, i) => i !== index);
+            return { ...prev, [section]: { ...prev[section], [listKey]: newList } };
+        });
     };
     const handleArrayChange = (section, key, index, value) => {
         const newArray = [...formData[section][key]];
@@ -384,6 +417,7 @@ const Admin = ({ content, onSave }) => {
             <div style={{ display: 'flex', gap: '5px', marginBottom: '20px', borderBottom: '1px solid #444' }}>
                 <TabButton label="📅 Bokningsöversikt" active={activeTab === 'bookings'} onClick={() => setActiveTab('bookings')} />
                 <TabButton label="✏️ Redigera Innehåll" active={activeTab === 'content'} onClick={() => setActiveTab('content')} />
+                <TabButton label="🎉 Arrangemang" active={activeTab === 'events'} onClick={() => setActiveTab('events')} />
             </div>
 
             {message && <div style={{ backgroundColor: '#4caf50', padding: '10px', borderRadius: '4px', marginBottom: '20px', textAlign: 'center', fontWeight: 'bold' }}>{message}</div>}
@@ -579,7 +613,6 @@ const Admin = ({ content, onSave }) => {
                             )}
                         </div>
 
-                        {/* MANUELL BOKNING */}
                         <div style={{ background: '#333', padding: '20px', borderRadius: '8px', marginTop: '40px' }}>
                             <h4 style={{ marginBottom: '15px', color: '#c5a059' }}>➕ Lägg till Manuell Bokning</h4>
                             <form onSubmit={addManualBooking}>
@@ -687,13 +720,6 @@ const Admin = ({ content, onSave }) => {
                         <h2>Hemsidans Text</h2>
 
                         <div className="group-box">
-                            <h3>Bekräftelse Popup (Efter bokning)</h3>
-                            <Input label="Rubrik" value={formData.confirmationPopup?.title} onChange={(e) => handleChange('confirmationPopup', 'title', e.target.value)} />
-                            <TextArea label="Meddelande Rad 1" value={formData.confirmationPopup?.message1} onChange={(e) => handleChange('confirmationPopup', 'message1', e.target.value)} />
-                            <TextArea label="Meddelande Rad 2" value={formData.confirmationPopup?.message2} onChange={(e) => handleChange('confirmationPopup', 'message2', e.target.value)} />
-                        </div>
-
-                        <div className="group-box">
                             <h3>Hero / Topp</h3>
                             <Input label="Rubrik" value={formData.hero?.title} onChange={(e) => handleChange('hero', 'title', e.target.value)} />
                             <Input label="Underrubrik" value={formData.hero?.subtitle} onChange={(e) => handleChange('hero', 'subtitle', e.target.value)} />
@@ -703,9 +729,9 @@ const Admin = ({ content, onSave }) => {
 
                         <div className="group-box">
                             <h3>Intro / Filosofi</h3>
-                            <Input label="Rubrik (Huvud)" value={formData.intro?.title} onChange={(e) => handleChange('intro', 'title', e.target.value)} />
+                            <Input label="Rubrik (Huvud)" value={formData.intro?.mainTitle} onChange={(e) => handleChange('intro', 'mainTitle', e.target.value)} />
                             <Input label="Etikett" value={formData.intro?.label} onChange={(e) => handleChange('intro', 'label', e.target.value)} />
-                            <TextArea label="Text (Intro - Framtidsplaner)" value={formData.intro?.description} onChange={(e) => handleChange('intro', 'description', e.target.value)} />
+                            <TextArea label="Text (Intro - Framtidsplaner)" value={formData.intro?.mainDescription} onChange={(e) => handleChange('intro', 'mainDescription', e.target.value)} />
 
                             <h4 style={{ marginTop: '15px', color: '#c5a059' }}>Del 1: Garden (Vänster bild)</h4>
                             <Input label="Rubrik (Garden)" value={formData.intro?.gardenTitle} onChange={(e) => handleChange('intro', 'gardenTitle', e.target.value)} />
@@ -758,16 +784,13 @@ const Admin = ({ content, onSave }) => {
                                 </div>
                             ))}
                             <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '', specificDate: '', isExclusive: false })}>+ Rätt</button>
+                        </div>
 
-                            <h4 style={{ marginTop: '20px' }}>Dryck / Barnmeny</h4>
-                            {formData.menu?.drinksGroups?.map((dish, i) => (
-                                <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px', padding: '10px', background: '#333' }}>
-                                    <input value={dish.title} onChange={e => handleObjectArrayChange('menu', 'drinksGroups', i, 'title', e.target.value)} style={{ flex: 1 }} />
-                                    <input value={dish.description} onChange={e => handleObjectArrayChange('menu', 'drinksGroups', i, 'description', e.target.value)} style={{ flex: 2 }} />
-                                    <button onClick={() => handleDeleteItem('menu', 'drinksGroups', i)} style={{ color: 'red' }}>X</button>
-                                </div>
-                            ))}
-                            <button onClick={() => handleAddItem('menu', 'drinksGroups', { title: 'Ny', description: '' })}>+ Grupp</button>
+                        <div className="group-box">
+                            <h3>Bekräftelse Popup (Efter bokning)</h3>
+                            <Input label="Rubrik" value={formData.confirmationPopup?.title} onChange={(e) => handleChange('confirmationPopup', 'title', e.target.value)} />
+                            <TextArea label="Meddelande Rad 1" value={formData.confirmationPopup?.message1} onChange={(e) => handleChange('confirmationPopup', 'message1', e.target.value)} />
+                            <TextArea label="Meddelande Rad 2" value={formData.confirmationPopup?.message2} onChange={(e) => handleChange('confirmationPopup', 'message2', e.target.value)} />
                         </div>
                     </div>
 
@@ -781,6 +804,51 @@ const Admin = ({ content, onSave }) => {
                 </div>
             )}
 
+            {activeTab === 'events' && (
+                <div style={{ maxWidth: '800px', margin: '0 auto', background: '#222', padding: '20px', borderRadius: '4px' }}>
+                    <h2 style={{ color: '#c5a059', borderBottom: '1px solid #444', paddingBottom: '10px', marginBottom: '20px' }}>Hantera Arrangemang</h2>
+
+                    {formData.events?.map((event, i) => (
+                        <div key={i} style={{ background: '#333', padding: '15px', marginBottom: '15px', borderRadius: '4px', border: '1px solid #444' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                <Input label="Titel" value={event.title} onChange={(e) => handleObjectArrayChange('events', null, i, 'title', e.target.value)} />
+                                <Input label="Datum (Text, t.ex '14. Feb')" value={event.date} onChange={(e) => handleObjectArrayChange('events', null, i, 'date', e.target.value)} />
+                            </div>
+                            <TextArea label="Beskrivning" value={event.description} onChange={(e) => handleObjectArrayChange('events', null, i, 'description', e.target.value)} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
+                                <Input label="Bokningsdatum (YYYY-MM-DD)" value={event.bookingDate} onChange={(e) => handleObjectArrayChange('events', null, i, 'bookingDate', e.target.value)} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', background: '#222', padding: '5px 10px', borderRadius: '4px', border: '1px solid #444' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={event.hidden || false}
+                                            onChange={(e) => handleObjectArrayChange('events', null, i, 'hidden', e.target.checked)}
+                                            style={{ marginRight: '8px', cursor: 'pointer' }}
+                                        />
+                                        <label style={{ color: '#ccc', fontSize: '0.9rem', cursor: 'pointer' }}>Dölj detta event</label>
+                                    </div>
+                                    <button onClick={() => handleDeleteItem('events', null, i)} style={{ padding: '8px 15px', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Ta bort Event</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    <button
+                        onClick={() => handleAddItem('events', null, { title: 'Nytt Event', date: '', description: '', bookingDate: '', imageUrl: '' })}
+                        style={{ padding: '10px 20px', background: '#4caf50', color: '#fff', border: 'none', borderRadius: '2px', cursor: 'pointer', marginBottom: '30px' }}
+                    >
+                        + Lägg till Nytt Event
+                    </button>
+
+                    <button
+                        onClick={handleSaveContent}
+                        disabled={isSaving}
+                        style={{ padding: '15px', width: '100%', background: '#c5a059', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}
+                    >
+                        {isSaving ? "Sparar..." : "SPARA ALLT"}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
