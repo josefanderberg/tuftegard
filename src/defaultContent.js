@@ -1,9 +1,9 @@
 export const defaultContent = {
     hero: {
-        subtitle: "Ein smak av det gode liv",
-        title: "Bordsetning mellom morelltrea",
-        description: "Der samtalen flyt like lett som vinen, enten under sommarsola eller rundt bålpanna.",
-        buttonText: "Opplev Atmosfæren"
+        subtitle: "",
+        title: "Midt i morellhagen",
+        description: "Velkommen til Tufte Gård – en familiedrevet morellgård og gårdskafé i Telemark.",
+        buttonText: "Opplev Sesongens Tilbud"
     },
     intro: {
         label: "Tufte Gård",
@@ -63,7 +63,10 @@ export const defaultContent = {
             { url: '/tufte15.png', category: 'sommar' },
             { url: '/tufte16.png', category: 'sommar' },
             { url: '/tufte17.png', category: 'sommar' },
-            { url: '/tufte13.png', category: 'sommar' }
+            { url: '/tufte13.png', category: 'sommar' },
+            { url: '/tufte21.png', category: 'sommar' },
+            { url: '/tufte22.png', category: 'sommar' }
+
         ]
     },
     menu: {

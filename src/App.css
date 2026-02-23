@@ -22,6 +22,7 @@ body {
   color: var(--text-dark);
   line-height: 1.6;
   background-color: var(--light);
+
 }
 
 h1,
@@ -56,6 +57,7 @@ button {
 
 .header-container {
   max-width: 1200px;
+
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -155,23 +157,25 @@ button {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
   width: 100%;
-  height: 100svh;
+  height: 100vh;
+  min-height: 100svh;
+  /* Använd vh istället för svh för att undvika scroll-hopp på mobil */
   background-size: cover;
-  background-position: center;
   z-index: -1;
   /* Måste vara bakom allt innehåll */
-  will-change: transform;
   /* För mjukare mobilanimering */
+  overflow: hidden;
 }
 
 /* --- HERO --- */
 .hero {
-  height: 100svh;
-  /* Modern standard som hanterar mobila adressfält bättre */
+  height: 100vh;
+  min-height: 100svh;
+  /* Modern standard som hanterar mobila adressfält bättre, men min-height förhindrar hopp */
   /* VIKTIGT: Tar bort bakgrundsstilar härifrån och gör bakgrunden transparent */
   background: transparent;
-  background-attachment: scroll;
   /* Sätter till scroll för att rensa eventuella problem */
   display: flex;
   align-items: center;
@@ -179,7 +183,6 @@ button {
   text-align: center;
   color: var(--light);
   padding: 0 20px;
-  position: relative;
   /* Sätter z-index 0, så content syns över fixed background */
 }
 

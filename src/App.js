@@ -72,7 +72,7 @@ function App() {
   };
 
   if (loading) {
-    return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', color: '#fff' }}>Laddar Tufte Gård...</div>;
+    return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', color: '#fff' }}>Laddar...</div>;
   }
 
   return (
