@@ -47,10 +47,19 @@ const Home = ({ content: propContent }) => {
     // Merge propContent with defaultContent to ensure new keys exist
     // This is a simple deep merge for specific sections we know changed
     const content = {
+        ...defaultContent,
         ...propContent,
         intro: {
             ...defaultContent.intro,
-            ...propContent.intro
+            ...(propContent.intro || {})
+        },
+        winter: {
+            ...defaultContent.winter,
+            ...(propContent.winter || {})
+        },
+        summer: {
+            ...defaultContent.summer,
+            ...(propContent.summer || {})
         }
     };
 
@@ -267,7 +276,7 @@ const Home = ({ content: propContent }) => {
 
             <header className={`header ${scrolled ? 'scrolled' : ''}`}>
                 <div className="header-container">
-                    <h1 className="logo" onClick={() => scrollToSection('hjem')}>Tufte Gård</h1>
+                    <img src="/logo.png" alt="Tufte Gård" className="logo" onClick={() => scrollToSection('hjem')} />
                     <button className={`menu-toggle ${menuOpen ? 'active' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
                         <span className="bar"></span><span className="bar"></span><span className="bar"></span>
                     </button>
@@ -323,20 +332,6 @@ const Home = ({ content: propContent }) => {
                 </RevealOnScroll>
             </div>
 
-            {/* --- SEKTION 4: VINTER/STÄMNING (Bild Vänster / Text Höger) --- */}
-            <div id="vinter" className="split-section">
-                <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte3.png')" }}>
-                    {/* Bild Container */}
-                </RevealOnScroll>
-                <RevealOnScroll className="split-content slide-right">
-                    <span className="label">{content.winter.title}</span>
-                    <p style={{ whiteSpace: 'pre-line' }}>{content.winter.textPart1}</p>
-                    <p style={{ whiteSpace: 'pre-line' }}>{content.winter.textPart2}</p>
-                    <button className="btn-primary" style={{ marginTop: '40px', alignSelf: 'center' }} onClick={() => scrollToSection('kontakt')}>Bestill Bålpanne</button>
-                </RevealOnScroll>
-
-            </div>
-
             {/* --- KOMMENDE ARRANGEMANG --- */}
             <section id="arrangemant" className="events-section">
                 <div className="section-header">
@@ -381,6 +376,7 @@ const Home = ({ content: propContent }) => {
                 </div>
             </section>
 
+            {/* --- GALLERI MED DYNAMISK TEXT --- */}
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
                     <h3>{content.gallery.title}</h3>
@@ -417,6 +413,26 @@ const Home = ({ content: propContent }) => {
                         </button>
                     </div>
                 </div>
+
+                {/* --- DYNAMISK TEXT --- */}
+                <div className="gallery-dynamic-text" style={{ maxWidth: '800px', margin: '0 auto 40px auto', textAlign: 'center', padding: '0 20px' }}>
+                    {galleryFilter === 'vinter' ? (
+                        <RevealOnScroll>
+                            <h4 style={{ fontSize: '1.8rem', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>{content.winter?.title}</h4>
+                            <p style={{ whiteSpace: 'pre-line', marginBottom: '15px' }}>{content.winter?.textPart1}</p>
+                            <p style={{ whiteSpace: 'pre-line', marginBottom: '20px' }}>{content.winter?.textPart2}</p>
+                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Bestill Bålpanne</button>
+                        </RevealOnScroll>
+                    ) : (
+                        <RevealOnScroll>
+                            <h4 style={{ fontSize: '1.8rem', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>{content.summer?.title}</h4>
+                            <p style={{ whiteSpace: 'pre-line', marginBottom: '15px' }}>{content.summer?.textPart1}</p>
+                            <p style={{ whiteSpace: 'pre-line', marginBottom: '20px' }}>{content.summer?.textPart2}</p>
+                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Boka Bord</button>
+                        </RevealOnScroll>
+                    )}
+                </div>
+
                 <div className="masonry-grid">
                     {displayedGalleryImages.slice(0, visibleImagesCount).map((imgObj, index) => (
                         <div key={index} className="masonry-item">

@@ -3,11 +3,12 @@
   --primary-dark: #1a1a1a;
   --secondary-dark: #2c2c2c;
   --gold: #c5a059;
+  --logo-color: #c5a059;
   --gold-hover: #e6b86a;
   --light: #f4f4f4;
   --text-dark: #333;
   --text-light: #f9f9f9;
-  --font-serif: 'Playfair Display', serif;
+  --font-serif: 'Cinzel', 'Playfair Display', serif;
   --font-sans: 'Lato', sans-serif;
 }
 
@@ -67,10 +68,14 @@ button {
 }
 
 .logo {
-  color: var(--light);
-  font-size: 1.8rem;
-  letter-spacing: 2px;
+  height: 60px;
+  width: auto;
   cursor: pointer;
+  transition: height 0.3s ease;
+}
+
+.header.scrolled .logo {
+  height: 45px;
 }
 
 .nav-menu {
@@ -93,13 +98,13 @@ button {
 }
 
 .btn-book {
-  border: 1px solid var(--gold) !important;
+  border: 1px solid var(--logo-color) !important;
   padding: 8px 20px;
   border-radius: 2px;
 }
 
 .btn-book:hover {
-  background-color: var(--gold) !important;
+  background-color: var(--logo-color) !important;
   color: var(--primary-dark) !important;
 }
 
@@ -221,7 +226,7 @@ button {
 }
 
 .btn-primary {
-  background-color: var(--gold);
+  background-color: var(--logo-color);
   color: var(--primary-dark);
   border: none;
   padding: 15px 40px;
@@ -232,7 +237,8 @@ button {
 }
 
 .btn-primary:hover {
-  background-color: var(--gold-hover);
+  background-color: var(--logo-color);
+  opacity: 0.9;
   transform: translateY(-2px);
 }
 

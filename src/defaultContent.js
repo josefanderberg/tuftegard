@@ -16,9 +16,15 @@ export const defaultContent = {
     },
     winter: {
         label: "Vinter: Nytt Konsept",
-        title: "Varme rundt bålpanna",
-        textPart1: "Velkommen til Tufte Gård rundt bålpanna. Me gleder oss stort til å introdusere vårt nye vinterkonsept. Frå romjulen kan du og gjengen booke deires egen bålpanne (min. 4 personer) og nyte ein koselig stund under åpen himmel – med god mat, lune tepper og ekte vinterstemning.",
-        textPart2: "Me starter opp i romjulen, og planlegger å holde åpent kvar helg framover. Sikre deg plass ved bålpanna ved å ta kontakt!"
+        title: "Vinter på Tufte Gård",
+        textPart1: "Velkommen til Tufte Gård rundt bålpanna.\nVi gleder oss stort til å introdusere vårt nye vinterkonsept.\n\nUnder denne sesongen kan du og gjengen booke deres egen bålpanne (min. 4 personer) og nyte en koselig stund under åpen himmel – med god mat, lune tepper og ekte vinterstemning.",
+        textPart2: "Vi planlegger å holde åpent hver helg framover så lenge vi har været på vår side. Sikre deg plass ved bålpanna nå!"
+    },
+    summer: {
+        label: "Sommer i hagen",
+        title: "Sommer på Tufte Gård",
+        textPart1: "Om sommeren er det morellene som står i sentrum. Vi høster fra egen hage, og fyller disken med friske smaker, gode retter og søte fristelser. Du får sveler rett fra takka, saftige ostekaker og småretter laget med sesongens beste råvarer.",
+        textPart2: "Her sitter du bokstavelig talt midt i morellhagen – omringet av trær, folk og gode smaker. På vår store platting kan du senke skuldrene og nyte roen, enten du tar en kaffe i sola eller blir sittende lenge med noe godt i glasset."
     },
     events: [
         {
