@@ -275,7 +275,11 @@ const Admin = ({ content, onSave }) => {
         if (!window.confirm("Ta bort bokning?")) return;
         try {
             await deleteDoc(doc(db, "bookings", id));
-            fetchBookings();
+            // Update local state directly to make UI feel instant and handle historical records.
+            setBookings(prev => prev.filter(b => b.id !== id));
+            setHistoryBookings(prev => prev.filter(b => b.id !== id));
+            setAllBookingsForCalendar(prev => prev.filter(b => b.id !== id));
+            fetchBookings(); // Keeps background state fresh
         } catch (e) {
             alert("Kunde inte ta bort: " + e.message);
         }
@@ -285,13 +289,20 @@ const Admin = ({ content, onSave }) => {
         e.preventDefault();
         if (!editingBooking) return;
         try {
-            await updateDoc(doc(db, "bookings", editingBooking.id), {
+            const updatedData = {
                 ...editingBooking,
                 dishes: editingBooking.dishes || {}
-            });
+            };
+            await updateDoc(doc(db, "bookings", editingBooking.id), updatedData);
             alert("Bokning uppdaterad!");
+
+            // Update local state for both history and upcoming lists
+            setBookings(prev => prev.map(b => b.id === editingBooking.id ? updatedData : b));
+            setHistoryBookings(prev => prev.map(b => b.id === editingBooking.id ? updatedData : b));
+            setAllBookingsForCalendar(prev => prev.map(b => b.id === editingBooking.id ? updatedData : b));
+
             setEditingBooking(null);
-            fetchBookings();
+            fetchBookings(); // Keeps background state fresh 
         } catch (error) {
             alert("Kunde inte uppdatera: " + error.message);
         }
