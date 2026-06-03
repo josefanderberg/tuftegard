@@ -906,7 +906,7 @@ const Admin = ({ content, onSave }) => {
                                                 style={{ width: '100%', padding: '5px', background: '#333', color: '#fff', border: '1px solid #555', fontSize: '0.8rem' }}
                                             >
                                                 <option value="vinter">Vinter</option>
-                                                <option value="sommar">Sommar</option>
+                                                <option value="sommar">Sommer</option>
                                             </select>
                                         </div>
                                         <div style={{ marginBottom: '5px' }}>

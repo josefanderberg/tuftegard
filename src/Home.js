@@ -11,6 +11,7 @@ import emailjs from '@emailjs/browser';
 import { defaultContent } from './defaultContent';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import MorellGame from './MorellGame';
 
 registerLocale('nb', nb);
 
@@ -297,6 +298,15 @@ const Home = ({ content: propContent }) => {
                     <p>{content.hero.description}</p>
                     <button className="btn-primary" onClick={() => scrollToSection('galleri')}>Opplev Sesongens Tilbud</button>
                 </div>
+
+                <div className="hero-opening-hours">
+                    <span className="opening-hours-title">Åpningstider</span>
+                    <div className="opening-hours-list">
+                        <div>Onsdag–Torsdag: 12–19</div>
+                        <div>Fredag–Lørdag: 12–22</div>
+                        <div>Søndag: 12–18</div>
+                    </div>
+                </div>
             </section>
 
 
@@ -305,7 +315,7 @@ const Home = ({ content: propContent }) => {
             {/* --- SEKTION 1: INTRO / FILOSOFI (Only Label + Symbol) --- */}
             <section className="text-center" style={{ padding: '80px 20px 40px', backgroundColor: '#fff', position: 'relative', zIndex: 1, width: '100%' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <span className="label" style={{ marginBottom: '20px', display: 'block' }}>{content.intro.mainTitle}</span>
+                    <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.mainTitle}</h3>
                     <p style={{ whiteSpace: 'pre-line' }}>{content.intro.mainDescription}</p>
                     <div className="divider" style={{ marginTop: '30px' }}>🍒</div>
                 </div>
@@ -318,7 +328,7 @@ const Home = ({ content: propContent }) => {
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-right">
-                        <span className="label">{content.intro.gardenTitle}</span>
+                        <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.gardenTitle}</h3>
                         <p style={{ whiteSpace: 'pre-line' }}>{content.intro.gardenText}</p>
                     </RevealOnScroll>
                 </div>
@@ -331,7 +341,7 @@ const Home = ({ content: propContent }) => {
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-left">
-                        <span className="label">{content.intro.foodTitle}</span>
+                        <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.foodTitle}</h3>
                         <p style={{ whiteSpace: 'pre-line' }}>{content.intro.foodText}</p>
                     </RevealOnScroll>
                 </div>
@@ -432,14 +442,14 @@ const Home = ({ content: propContent }) => {
                             <h4 style={{ fontSize: '1.8rem', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>{content.winter?.title}</h4>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '15px' }}>{content.winter?.textPart1}</p>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '20px' }}>{content.winter?.textPart2}</p>
-                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Bestill Bålpanne</button>
+                            <button className="btn-primary" style={{ marginTop: '20px', opacity: 0.5, cursor: 'not-allowed' }} disabled>Bestill Bålpanne (Stengt for sesongen)</button>
                         </RevealOnScroll>
                     ) : (
                         <RevealOnScroll>
                             <h4 style={{ fontSize: '1.8rem', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>{content.summer?.title}</h4>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '15px' }}>{content.summer?.textPart1}</p>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '20px' }}>{content.summer?.textPart2}</p>
-                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Boka Bord</button>
+                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Reserver bord</button>
                         </RevealOnScroll>
                     )}
                 </div>
@@ -459,6 +469,8 @@ const Home = ({ content: propContent }) => {
                     </div>
                 )}
             </section>
+
+            <MorellGame />
 
             <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte2.png')" }}>
                 <div className="menu-overlay"></div>
@@ -493,7 +505,7 @@ const Home = ({ content: propContent }) => {
                             return (
                                 <>
                                     <div className="menu-column-half">
-                                        <h4 className="menu-column-title">MAT</h4>
+                                        <h4 className="menu-column-title">&nbsp;</h4>
                                         <ul className="menu-list">
                                             {matDishes.map((item, index) => (
                                                 <li key={index} className="menu-item">
@@ -501,13 +513,21 @@ const Home = ({ content: propContent }) => {
                                                         <span className="menu-item-title">{item.title}</span>
                                                         {item.price && <span className="menu-item-price">{item.price}</span>}
                                                     </div>
-                                                    <p className="menu-item-desc">{item.description}</p>
+                                                    <p className="menu-item-desc">
+                                                        {item.description && item.description.split('\n').map((line, i) => {
+                                                            const trimmed = line.trim();
+                                                            if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
+                                                                return <span key={i} style={{ display: 'block', fontWeight: 'bold', color: '#ffffff', marginTop: '4px' }}>{line}</span>;
+                                                            }
+                                                            return <span key={i} style={{ display: 'block' }}>{line}</span>;
+                                                        })}
+                                                    </p>
                                                 </li>
                                             ))}
                                         </ul>
                                     </div>
                                     <div className="menu-column-half">
-                                        <h4 className="menu-column-title">MÆVL</h4>
+                                        <h4 className="menu-column-title">MÆVLEMENY <span className="menu-column-subtitle">(småretter/snacks)</span></h4>
                                         <ul className="menu-list">
                                             {maevlDishes.map((item, index) => (
                                                 <li key={index} className="menu-item">
@@ -515,7 +535,15 @@ const Home = ({ content: propContent }) => {
                                                         <span className="menu-item-title">{item.title}</span>
                                                         {item.price && <span className="menu-item-price">{item.price}</span>}
                                                     </div>
-                                                    <p className="menu-item-desc">{item.description}</p>
+                                                    <p className="menu-item-desc">
+                                                        {item.description && item.description.split('\n').map((line, i) => {
+                                                            const trimmed = line.trim();
+                                                            if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
+                                                                return <span key={i} style={{ display: 'block', fontWeight: 'bold', color: '#ffffff', marginTop: '4px' }}>{line}</span>;
+                                                            }
+                                                            return <span key={i} style={{ display: 'block' }}>{line}</span>;
+                                                        })}
+                                                    </p>
                                                 </li>
                                             ))}
                                         </ul>
@@ -524,6 +552,10 @@ const Home = ({ content: propContent }) => {
                             );
                         })()}
                     </div>
+
+                    <p className="menu-info-note" style={{ marginTop: '40px', textAlign: 'center', fontSize: 'var(--fs-base)', color: 'var(--gold)', fontStyle: 'italic' }}>
+                        Vi har drop-in, men om dere er et større selskap må dere gjerne reservere bord.
+                    </p>
 
                 </div>
             </section>

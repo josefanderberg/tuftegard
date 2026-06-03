@@ -15,7 +15,7 @@ const db = getFirestore(app);
 
 const newMenu = {
     label: "Kafé & Gårdsutsalg",
-    title: "Sommarmeny",
+    title: "Sommermeny",
     intro: "Velkommen til en smak av sommer på Tufte Gård! Vi serverer deilige, friske retter laget med kjærlighet.",
     priceNote: "",
     priceNotePrefix: "",
@@ -23,50 +23,50 @@ const newMenu = {
     mainCourses: [
         {
             title: "Focaccia",
-            price: "139,-",
-            description: "Speke, mozzarella, pesto, tomat (GH, M, SV, SEN) / Porchetta, bakt hvitløk, chimmichurri, sylta rødløk (GH, SEN, SV, E)",
+            price: "139 kr",
+            description: "Luftig italiensk brød fylt med gode råvarer\n\n• Spekeskinke, mozzarella, pesto og tomat\n• Porchetta, bakt hvitløk, chimichurri og syltet rødløk",
             category: "mat"
         },
         {
             title: "Langos",
-            price: "169,-",
-            description: "Skagenrøre, rødløk, dill, rogn (GH, SK, F, SEN, SV) / Speke, urtekremost, rødløk, sylta chili (GH, M, SV)",
+            price: "179 kr",
+            description: "Ungarsk gatemat på sitt beste – et gyllent, frityrstekt potetbrød toppet med smakfulle råvarer.\n\n• Skagenrøre, rødløk, dill og rogn\n• Spekeskinke, urtekremost, rødløk og syltet chili",
             category: "mat"
         },
         {
             title: "Smørgåstårta",
-            price: "199,-",
-            description: "(GH, M, F, SK, SV, SEN)",
+            price: "199 kr",
+            description: "En svensk favoritt med lag på lag av mykt brød, kremet fyll og friske smaker fra hav og hage.",
             category: "mat"
         },
         {
-            title: "Krokett",
-            price: "95,-",
-            description: "Ølkokt svinekjake m/grilla paprikamajones (GH, E, SV, SEN)",
+            title: "Kroketter",
+            price: "105 kr",
+            description: "Ølkokt svinekjake med grillet paprikamajones",
             category: "maevl"
         },
         {
-            title: "Fritert brie",
-            price: "85,-",
-            description: "(Tuftes chili cheese) m/ripssyltetøy og sylta chili (GH, M, SV)",
+            title: "Tuftes Chili Cheese",
+            price: "89 kr",
+            description: "Fritert brie med rips- og chilisyltetøy",
             category: "maevl"
         },
         {
             title: "Lammeribbe",
-            price: "105,-",
-            description: "m/glaze og jalapenomayo (SO, E, SV, SES, SEN)",
+            price: "125 kr",
+            description: "Glasert lammeribbe med jalapeño og vårløk",
             category: "maevl"
         },
         {
-            title: "Potetgull",
-            price: "115,-",
-            description: "m/rogn, rømme, rødløk og dill (F, M)",
+            title: "Luksus Potetgull",
+            price: "115 kr",
+            description: "Med rogn, rømme, rødløk og dill",
             category: "maevl"
         },
         {
-            title: "Pommes Frites",
-            price: "65,-",
-            description: "m/aioli (E, SV, SEN)",
+            title: "Pommes frites",
+            price: "69 kr",
+            description: "Med aioli",
             category: "maevl"
         }
     ],

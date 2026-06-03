@@ -53,7 +53,7 @@ export const defaultContent = {
         }
     ],
     gallery: {
-        title: "Øyeblikk fra gården",
+        title: "Glimt fra gården",
         images: [
             { url: '/tufte18.png', category: 'vinter' },
             { url: '/tufte19.png', category: 'vinter' },
@@ -77,7 +77,7 @@ export const defaultContent = {
     },
     menu: {
         label: "Kafé & Gårdsutsalg",
-        title: "Sommarmeny",
+        title: "Sommermeny",
         intro: "Velkommen til en smak av sommer på Tufte Gård! Vi serverer deilige, friske retter laget med kjærlighet.",
         priceNote: "",
         priceNotePrefix: "",

@@ -10,6 +10,15 @@
   --text-light: #f9f9f9;
   --font-serif: 'Fredoka', sans-serif;
   --font-sans: 'Quicksand', sans-serif;
+
+  /* Consistent typography sizing system */
+  --fs-xs: 0.85rem;
+  --fs-sm: 0.95rem;
+  --fs-base: 1.05rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.6rem;
+  --fs-xxl: 2.5rem;
+  --fs-display: 3.5rem;
 }
 
 * {
@@ -150,7 +159,7 @@ button {
     overflow: hidden;
 
     /* ÄNDRING 2: Lägg till padding i transition för mjuk animation */
-    transition: max-height 0.4s ease, padding 0.4s ease;
+    transition: max-height 0.4s ease, padding 0.4s ease, background-color 0.3s ease;
   }
 
   .nav-menu.open {
@@ -158,6 +167,18 @@ button {
 
     /* ÄNDRING 3: Lägg tillbaka paddingen här när den öppnas */
     padding: 20px;
+  }
+
+  .header:not(.scrolled) .nav-menu {
+    background-color: rgba(26, 26, 26, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .header.scrolled .nav-menu {
+    background-color: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 }
 
@@ -172,11 +193,8 @@ button {
   max-width: 100%;
   height: 100%;
   min-height: 100%;
-  /* Använd vh istället för svh för att undvika scroll-hopp på mobil */
   background-size: cover;
   z-index: -1;
-  /* Måste vara bakom allt innehåll */
-  /* För mjukare mobilanimering */
   overflow: hidden;
 }
 
@@ -187,17 +205,69 @@ button {
   width: 100%;
   min-width: 100%;
   max-width: 100%;
-  /* Modern standard som hanterar mobila adressfält bättre, men min-height förhindrar hopp */
-  /* VIKTIGT: Tar bort bakgrundsstilar härifrån och gör bakgrunden transparent */
   background: transparent;
-  /* Sätter till scroll för att rensa eventuella problem */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: var(--light);
   padding: 0 20px;
-  /* Sätter z-index 0, så content syns över fixed background */
+  position: relative; /* Stödjer absolut positionering av öppettider */
+}
+
+.hero-opening-hours {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  text-align: left;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.45);
+  padding: 15px 22px;
+  border-left: 3px solid var(--gold);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 2px;
+}
+
+.opening-hours-title {
+  display: block;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  font-family: var(--font-sans);
+}
+
+.opening-hours-list {
+  font-size: var(--fs-sm);
+  color: #ffffff;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 80px;
+  }
+
+  .hero-opening-hours {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    background: transparent;
+    border-left: none;
+    padding: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    width: 100%;
+    max-width: 280px;
+  }
 }
 
 .hero-content {
@@ -210,19 +280,19 @@ button {
   font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 4px;
-  font-size: 0.9rem;
+  font-size: var(--fs-xs);
   margin-bottom: 15px;
   color: #ffffff;
 }
 
 .hero h2 {
-  font-size: 3.5rem;
+  font-size: var(--fs-display);
   margin-bottom: 20px;
   line-height: 1.2;
 }
 
 .hero p {
-  font-size: 1.2rem;
+  font-size: var(--fs-lg);
   margin-bottom: 30px;
   max-width: 600px;
   margin-left: auto;
@@ -234,7 +304,7 @@ button {
   color: var(--primary-dark);
   border: none;
   padding: 15px 40px;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: 0.3s;
@@ -278,9 +348,16 @@ button {
   font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: #888;
   margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: var(--fs-xxl);
+  color: var(--primary-dark);
+  font-family: var(--font-serif);
+  margin-bottom: 20px;
 }
 
 .divider {
@@ -368,6 +445,8 @@ button {
   background-size: cover;
   background-position: center;
   min-height: 400px;
+  border-radius: 24px;
+  margin: 15px;
 }
 
 .split-content {
@@ -379,7 +458,7 @@ button {
 }
 
 .split-content h3 {
-  font-size: 2rem;
+  font-size: var(--fs-xxl);
   margin-bottom: 20px;
 }
 
@@ -397,7 +476,7 @@ button {
 }
 
 .section-header h3 {
-  font-size: 2.5rem;
+  font-size: var(--fs-xxl);
 }
 
 .masonry-grid {
@@ -520,7 +599,7 @@ button {
 
 .menu-column-title {
   font-family: var(--font-serif);
-  font-size: 1.8rem;
+  font-size: var(--fs-xl);
   font-weight: 600;
   text-transform: uppercase;
   color: #ffffff;
@@ -528,6 +607,15 @@ button {
   padding-bottom: 8px;
   margin-bottom: 25px;
   letter-spacing: 1px;
+}
+
+.menu-column-subtitle {
+  font-size: var(--fs-xs);
+  text-transform: none;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  display: inline-block;
+  margin-left: 6px;
 }
 
 .menu-list {
@@ -549,14 +637,14 @@ button {
 
 .menu-item-title {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: var(--fs-lg);
   font-weight: 600;
   color: #ffffff;
 }
 
 .menu-item-price {
   font-family: var(--font-sans);
-  font-size: 1.15rem;
+  font-size: var(--fs-lg);
   font-weight: 600;
   color: var(--gold);
   margin-left: 10px;
@@ -565,7 +653,7 @@ button {
 
 .menu-item-desc {
   font-family: var(--font-sans);
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
   color: rgba(255, 255, 255, 0.75);
   line-height: 1.5;
   white-space: pre-line;
