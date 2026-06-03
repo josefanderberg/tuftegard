@@ -470,8 +470,6 @@ const Home = ({ content: propContent }) => {
                 )}
             </section>
 
-            <MorellGame />
-
             <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte2.png')" }}>
                 <div className="menu-overlay"></div>
                 <div className="menu-content-wrapper" style={{ maxWidth: '1100px', width: '100%' }}>
@@ -635,6 +633,9 @@ const Home = ({ content: propContent }) => {
                     <p className="booking-info" style={{ marginTop: '20px' }}>{content.booking.contactInfo}</p>
                 </div>
             </section>
+
+            <MorellGame />
+
             <section id="hitta-hit" className="map-section">
                 <div className="section-header">
                     <h3>Finn frem</h3>
