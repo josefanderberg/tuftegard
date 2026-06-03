@@ -86,6 +86,7 @@ const Home = ({ content: propContent }) => {
     });
 
     const [submitting, setSubmitting] = useState(false);
+    const [bookingStep, setBookingStep] = useState(1);
 
     // Konvertera sträng-datum från content till Date-objekt
     const openDates = (content.calendar?.openDates || []).map(d => new Date(d));
@@ -167,7 +168,7 @@ const Home = ({ content: propContent }) => {
         }
     };
 
-    const [galleryFilter, setGalleryFilter] = useState('vinter');
+    const [galleryFilter, setGalleryFilter] = useState('sommar');
 
     const allGalleryImages = content.gallery?.images || [];
     const displayedGalleryImages = allGalleryImages.filter(img => {
@@ -284,7 +285,7 @@ const Home = ({ content: propContent }) => {
                         <button onClick={() => scrollToSection('arrangemant')}>Arrangement</button>
                         <button onClick={() => scrollToSection('galleri')}>Galleri</button>
                         <button onClick={() => scrollToSection('meny')}>Mat & Drikke</button>
-                        <button onClick={() => scrollToSection('kontakt')} className="btn-book">Bestill Bålpanne</button>
+                        <button onClick={() => scrollToSection('kontakt')} className="btn-book">Reservera</button>
                     </nav>
                 </div>
             </header>
@@ -294,7 +295,7 @@ const Home = ({ content: propContent }) => {
                     <span className="subtitle">{content.hero.subtitle}</span>
                     <h2>{content.hero.title}</h2>
                     <p>{content.hero.description}</p>
-                    <button className="btn-primary" onClick={() => scrollToSection('vinter')}>Opplev Sesongens Tilbud</button>
+                    <button className="btn-primary" onClick={() => scrollToSection('galleri')}>Opplev Sesongens Tilbud</button>
                 </div>
             </section>
 
@@ -312,24 +313,28 @@ const Home = ({ content: propContent }) => {
 
             {/* --- SEKTION 2: GARDEN (Bild Vänster / Text Höger) --- */}
             <div className="split-section">
-                <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte8.png')" }}>
-                    {/* Bild Container */}
-                </RevealOnScroll>
-                <RevealOnScroll className="split-content slide-right">
-                    <span className="label">{content.intro.gardenTitle}</span>
-                    <p style={{ whiteSpace: 'pre-line' }}>{content.intro.gardenText}</p>
-                </RevealOnScroll>
+                <div className="split-section-inner">
+                    <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte8.png')" }}>
+                        {/* Bild Container */}
+                    </RevealOnScroll>
+                    <RevealOnScroll className="split-content slide-right">
+                        <span className="label">{content.intro.gardenTitle}</span>
+                        <p style={{ whiteSpace: 'pre-line' }}>{content.intro.gardenText}</p>
+                    </RevealOnScroll>
+                </div>
             </div>
 
             {/* --- SEKTION 3: MATEN (Bild Höger / Text Vänster) --- */}
-            <div className="split-section reverse">
-                <RevealOnScroll className="split-image slide-right" style={{ backgroundImage: "url('/tufte11.png')" }}>
-                    {/* Bild Container */}
-                </RevealOnScroll>
-                <RevealOnScroll className="split-content slide-left">
-                    <span className="label">{content.intro.foodTitle}</span>
-                    <p style={{ whiteSpace: 'pre-line' }}>{content.intro.foodText}</p>
-                </RevealOnScroll>
+            <div className="split-section">
+                <div className="split-section-inner reverse">
+                    <RevealOnScroll className="split-image slide-right" style={{ backgroundImage: "url('/tufte11.png')" }}>
+                        {/* Bild Container */}
+                    </RevealOnScroll>
+                    <RevealOnScroll className="split-content slide-left">
+                        <span className="label">{content.intro.foodTitle}</span>
+                        <p style={{ whiteSpace: 'pre-line' }}>{content.intro.foodText}</p>
+                    </RevealOnScroll>
+                </div>
             </div>
 
             {/* --- KOMMENDE ARRANGEMANG --- */}
@@ -340,40 +345,46 @@ const Home = ({ content: propContent }) => {
                     <p>Sett av datoen for våre spesielle kvelder.</p>
                 </div>
 
-                <div className="events-grid">
-                    {(content.events || []).filter(e => !e.hidden).map((event, index) => (
-                        <RevealOnScroll className="event-card" key={index} style={{ transitionDelay: `${index * 0.2}s` }}>
-                            <div className="event-date-large">
-                                <span className="day">{event.date?.split('.')[0] || '14'}</span>
-                                <span className="month">{event.date?.split('.')[1] || 'Feb'}</span>
-                            </div>
-                            <h4>{event.title}</h4>
-                            <p>{event.description}</p>
-                            <span
-                                onClick={() => {
-                                    if (event.bookingDate) {
-                                        setBookingDate(new Date(`${event.bookingDate}T12:00:00`));
-                                    }
-                                    scrollToSection('kontakt');
-                                }}
-                                className="btn-event"
-                            >
-                                Bestill Bord
-                            </span>
-                        </RevealOnScroll>
-                    ))}
-                    {(!content.events || (content.events.filter(e => !e.hidden).length === 0)) && (
-                        <RevealOnScroll className="event-card" style={{ gridColumn: '1/-1', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-                            <div className="event-date-large" style={{ opacity: 0.5 }}>
-                                <span className="day">--</span>
-                                <span className="month">--</span>
-                            </div>
-                            <h4>Inga planlagde arrangement</h4>
-                            <p>Akkurat no har me ingen fastsette datoar, men følg med – det kjem meir!</p>
-                            <span onClick={() => scrollToSection('kontakt')} className="btn-event">Ta kontakt for spørsmål</span>
-                        </RevealOnScroll>
-                    )}
-                </div>
+                {(() => {
+                    const visibleEvents = (content.events || []).filter(e => !e.hidden);
+                    const isCentered = visibleEvents.length > 0 && visibleEvents.length <= 2;
+                    return (
+                        <div className={`events-grid ${isCentered ? 'centered' : ''}`}>
+                            {visibleEvents.map((event, index) => (
+                                <RevealOnScroll className="event-card" key={index} style={{ transitionDelay: `${index * 0.2}s` }}>
+                                    <div className="event-date-large">
+                                        <span className="day">{event.date?.split('.')[0] || '14'}</span>
+                                        <span className="month">{event.date?.split('.')[1] || 'Feb'}</span>
+                                    </div>
+                                    <h4>{event.title}</h4>
+                                    <p>{event.description}</p>
+                                    <span
+                                        onClick={() => {
+                                            if (event.bookingDate) {
+                                                setBookingDate(new Date(`${event.bookingDate}T12:00:00`));
+                                            }
+                                            scrollToSection('kontakt');
+                                        }}
+                                        className="btn-event"
+                                    >
+                                        Bestill Bord
+                                    </span>
+                                </RevealOnScroll>
+                            ))}
+                            {visibleEvents.length === 0 && (
+                                <RevealOnScroll className="event-card" style={{ gridColumn: '1/-1', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+                                    <div className="event-date-large" style={{ opacity: 0.5 }}>
+                                        <span className="day">--</span>
+                                        <span className="month">--</span>
+                                    </div>
+                                    <h4>Inga planlagde arrangement</h4>
+                                    <p>Akkurat no har me ingen fastsette datoar, men følg med – det kjem meir!</p>
+                                    <span onClick={() => scrollToSection('kontakt')} className="btn-event">Ta kontakt for spørsmål</span>
+                                </RevealOnScroll>
+                            )}
+                        </div>
+                    );
+                })()}
             </section>
 
             {/* --- GALLERI MED DYNAMISK TEXT --- */}
@@ -436,7 +447,7 @@ const Home = ({ content: propContent }) => {
                 <div className="masonry-grid">
                     {displayedGalleryImages.slice(0, visibleImagesCount).map((imgObj, index) => (
                         <div key={index} className="masonry-item">
-                            <img src={imgObj.url} alt={`Stemningsbilde ${index + 1}`} />
+                            <img src={imgObj.url} alt={`Tufte Gård ${imgObj.category || 'stemning'} bild ${index + 1}`} loading="lazy" />
                         </div>
                     ))}
                 </div>
@@ -449,49 +460,69 @@ const Home = ({ content: propContent }) => {
                 )}
             </section>
 
-            <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte3.png')" }}>
+            <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte2.png')" }}>
                 <div className="menu-overlay"></div>
-                <div className="menu-content-wrapper">
+                <div className="menu-content-wrapper" style={{ maxWidth: '1100px', width: '100%' }}>
                     <span className="label" style={{ color: 'var(--gold)' }}>{content.menu.label}</span>
                     <h3 className="yellowh3">{content.menu.title}</h3>
                     <p className="menu-intro">{content.menu.intro}</p>
-                    <div className="menu-columns" style={{ justifyContent: 'center' }}>
-                        <div className="menu-col" style={{ flex: '0 0 100%', maxWidth: '800px' }}>
-                            <h4 style={{ marginTop: '-2rem', marginBottom: '3rem' }}></h4>
-                            <ul>
-                                {(() => {
-                                    // 1. Filtrera fram relevanta rätter för valt datum (eller alla om inget datum valt)
-                                    let relevantDishes = mainCourses.filter(item => {
-                                        if (item.specificDate) {
-                                            if (!bookingDate) return false; // Dölj specifika om inget datum valt
-                                            const y = bookingDate.getFullYear();
-                                            const m = String(bookingDate.getMonth() + 1).padStart(2, '0');
-                                            const d = String(bookingDate.getDate()).padStart(2, '0');
-                                            const selectedDateStr = `${y}-${m}-${d}`;
-                                            return selectedDateStr === item.specificDate;
-                                        }
-                                        return true; // Visa standardrätter preliminärt
-                                    });
+                    
+                    <div className="menu-columns-container">
+                        {(() => {
+                            // 1. Filtrera fram relevanta rätter för valt datum (eller alla om inget datum valt)
+                            let relevantDishes = mainCourses.filter(item => {
+                                if (item.specificDate) {
+                                    if (!bookingDate) return false;
+                                    const y = bookingDate.getFullYear();
+                                    const m = String(bookingDate.getMonth() + 1).padStart(2, '0');
+                                    const d = String(bookingDate.getDate()).padStart(2, '0');
+                                    const selectedDateStr = `${y}-${m}-${d}`;
+                                    return selectedDateStr === item.specificDate;
+                                }
+                                return true;
+                            });
 
-                                    // 2. Kolla om någon av de relevanta rätterna är "Exklusiv"
-                                    const exclusiveDish = relevantDishes.find(d => d.isExclusive);
+                            const exclusiveDish = relevantDishes.find(d => d.isExclusive);
+                            const displayedDishes = exclusiveDish
+                                ? relevantDishes.filter(d => d.isExclusive)
+                                : relevantDishes;
 
-                                    // 3. Om exklusiv finns, visa BARA den/dem. Annars visa alla relevanta.
-                                    const displayedDishes = exclusiveDish
-                                        ? relevantDishes.filter(d => d.isExclusive)
-                                        : relevantDishes;
+                            const matDishes = displayedDishes.filter(d => d.category !== 'maevl');
+                            const maevlDishes = displayedDishes.filter(d => d.category === 'maevl');
 
-                                    if (displayedDishes.length === 0) return <p>Inga rätter tillgängliga.</p>;
-
-                                    return displayedDishes.map((item, index) => (
-                                        <li key={index}>
-                                            <strong>{item.title} {item.price && <span>{item.price}</span>}</strong>
-                                            <span>{item.description}</span>
-                                        </li>
-                                    ));
-                                })()}
-                            </ul>
-                        </div>
+                            return (
+                                <>
+                                    <div className="menu-column-half">
+                                        <h4 className="menu-column-title">MAT</h4>
+                                        <ul className="menu-list">
+                                            {matDishes.map((item, index) => (
+                                                <li key={index} className="menu-item">
+                                                    <div className="menu-item-header">
+                                                        <span className="menu-item-title">{item.title}</span>
+                                                        {item.price && <span className="menu-item-price">{item.price}</span>}
+                                                    </div>
+                                                    <p className="menu-item-desc">{item.description}</p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="menu-column-half">
+                                        <h4 className="menu-column-title">MÆVL</h4>
+                                        <ul className="menu-list">
+                                            {maevlDishes.map((item, index) => (
+                                                <li key={index} className="menu-item">
+                                                    <div className="menu-item-header">
+                                                        <span className="menu-item-title">{item.title}</span>
+                                                        {item.price && <span className="menu-item-price">{item.price}</span>}
+                                                    </div>
+                                                    <p className="menu-item-desc">{item.description}</p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
 
                 </div>
@@ -530,7 +561,6 @@ const Home = ({ content: propContent }) => {
                                 onChange={(date) => setBookingDate(date)}
                                 includeDates={openDates}
                                 locale="nb"
-                                // EXCLUDE FULLA DATUM
                                 excludeDates={fullyBookedDates.map(d => new Date(d))}
                                 placeholderText="Velg tilgjengelig dato"
                                 dateFormat="yyyy-MM-dd"
@@ -543,26 +573,10 @@ const Home = ({ content: propContent }) => {
                                     prevMonthButtonDisabled,
                                     nextMonthButtonDisabled,
                                 }) => (
-                                    <div style={{
-                                        margin: "5px 10px", // Mindre marginal
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        background: 'transparent'
-                                    }}>
-                                        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} type="button"
-                                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>
-                                            {"‹"}
-                                        </button>
-
-                                        <div style={{ fontWeight: 'bold', color: '#c5a059', textTransform: 'capitalize', whiteSpace: 'nowrap', fontSize: '1rem' }}>
-                                            {format(date, "MMMM yyyy", { locale: nb })}
-                                        </div>
-
-                                        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} type="button"
-                                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>
-                                            {"›"}
-                                        </button>
+                                    <div style={{ margin: "5px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", background: 'transparent' }}>
+                                        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} type="button" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>{"‹"}</button>
+                                        <div style={{ fontWeight: 'bold', color: '#c5a059', textTransform: 'capitalize', whiteSpace: 'nowrap', fontSize: '1rem' }}>{format(date, "MMMM yyyy", { locale: nb })}</div>
+                                        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} type="button" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#c5a059', padding: '0 10px' }}>{"›"}</button>
                                     </div>
                                 )}
                             />
@@ -582,48 +596,11 @@ const Home = ({ content: propContent }) => {
                             </select>
                         </div>
 
-                        <div style={{ margin: '30px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', padding: '20px 0', textAlign: 'left' }}>
-                            <h4 style={{ marginBottom: '15px', color: '#c5a059', textAlign: 'center' }}>Velg rett</h4>
-                            <p style={{ fontSize: '0.9rem', color: '#777', marginBottom: '20px', textAlign: 'center' }}>Vennligst oppgi antall på hver rett som ønskes servert til selskapet.</p>
-                            {(() => {
-                                // 1. Filtrera fram relevanta rätter
-                                let relevantDishes = mainCourses.filter(item => {
-                                    if (item.specificDate) {
-                                        if (!bookingDate) return false;
-                                        const y = bookingDate.getFullYear();
-                                        const m = String(bookingDate.getMonth() + 1).padStart(2, '0');
-                                        const d = String(bookingDate.getDate()).padStart(2, '0');
-                                        const selectedDateStr = `${y}-${m}-${d}`;
-                                        return selectedDateStr === item.specificDate;
-                                    }
-                                    return true;
-                                });
-
-                                // 2. Kolla efter exklusive
-                                const exclusiveDish = relevantDishes.find(d => d.isExclusive);
-
-                                // 3. Välj rätter att visa
-                                const displayedDishes = exclusiveDish
-                                    ? relevantDishes.filter(d => d.isExclusive)
-                                    : relevantDishes;
-
-                                return displayedDishes.map((dish, index) => (
-                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                        <label style={{ flex: 1, marginRight: '10px', fontSize: '0.95rem' }}>
-                                            {dish.title}
-                                            {dish.price && <span style={{ display: 'block', fontSize: '0.8em', color: '#999', fontWeight: 'normal' }}>{dish.price}</span>}
-                                        </label>
-                                        <input type="number" min="0" placeholder="0" style={{ width: '80px', height: '40px', padding: '5px', textAlign: 'center' }} onChange={(e) => handleDishCountChange(dish.title, e.target.value)} />
-                                    </div>
-                                ));
-                            })()}
-                        </div>
-
-                        <textarea placeholder="Har du allergener eller andre ønsker? Legg igjen en kommentar." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
-
-                        <button type="submit" disabled={submitting}>{submitting ? "Sender..." : "Send forespørsel"}</button>
+                        <textarea placeholder="Har du allergener eller andre ønsker? Legg igjen en kommentar." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} style={{ marginBottom: '20px' }}></textarea>
+                        
+                        <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={submitting}>{submitting ? "Sender..." : "Send forespørsel"}</button>
                     </form>
-                    <p className="booking-info">{content.booking.contactInfo}</p>
+                    <p className="booking-info" style={{ marginTop: '20px' }}>{content.booking.contactInfo}</p>
                 </div>
             </section>
             <section id="hitta-hit" className="map-section">

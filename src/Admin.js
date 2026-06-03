@@ -840,8 +840,12 @@ const Admin = ({ content, onSave }) => {
                                         <input placeholder="Maträtt" value={dish.title} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'title', e.target.value)} style={{ flex: 1, padding: '8px' }} />
                                         <input placeholder="Pris/Info (t.ex '(Pris pr. pers...)')" value={dish.price} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'price', e.target.value)} style={{ flex: 1, padding: '8px' }} />
                                     </div>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        <input placeholder="Beskrivning" value={dish.description} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'description', e.target.value)} style={{ flex: 1, padding: '8px' }} />
+                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                        <input placeholder="Beskrivning" value={dish.description} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'description', e.target.value)} style={{ flex: 2, padding: '8px' }} />
+                                        <select value={dish.category || 'mat'} onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'category', e.target.value)} style={{ flex: 1, padding: '8px', background: '#444', border: '1px solid #555', color: '#fff', height: '35px' }}>
+                                            <option value="mat">MAT</option>
+                                            <option value="maevl">MÆVL</option>
+                                        </select>
                                         <button onClick={() => handleDeleteItem('menu', 'mainCourses', i)} style={{ color: 'red', padding: '8px' }}>X</button>
                                     </div>
                                     <div style={{ marginTop: '5px', display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -857,13 +861,13 @@ const Admin = ({ content, onSave }) => {
                                                     onChange={e => handleObjectArrayChange('menu', 'mainCourses', i, 'isExclusive', e.target.checked)}
                                                     style={{ marginRight: '5px' }}
                                                 />
-                                                <label style={{ fontSize: '0.8rem', color: '#c5a059' }}>Visa ENDAST denna rätt detta datum?</label>
+                                                <label style={{ fontSize: '0.8rem', color: '#c5a059' }}>Visa ENDAST denna rätt dette datum?</label>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             ))}
-                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '', specificDate: '', isExclusive: false })}>+ Rätt</button>
+                            <button onClick={() => handleAddItem('menu', 'mainCourses', { title: 'Ny', price: '', description: '', specificDate: '', isExclusive: false, category: 'mat' })}>+ Rätt</button>
                         </div>
 
                         <div className="group-box">

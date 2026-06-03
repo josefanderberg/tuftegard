@@ -8,8 +8,8 @@
   --light: #f4f4f4;
   --text-dark: #333;
   --text-light: #f9f9f9;
-  --font-serif: 'Cinzel', 'Playfair Display', serif;
-  --font-sans: 'Lato', sans-serif;
+  --font-serif: 'Fredoka', sans-serif;
+  --font-sans: 'Quicksand', sans-serif;
 }
 
 * {
@@ -31,7 +31,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-serif);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 button {
@@ -51,7 +51,9 @@ button {
 }
 
 .header.scrolled {
-  background-color: rgba(26, 26, 26, 0.95);
+  background-color: rgba(26, 26, 26, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 10px 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
@@ -101,11 +103,13 @@ button {
   border: 1px solid var(--logo-color) !important;
   padding: 8px 20px;
   border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
 .btn-book:hover {
   background-color: var(--logo-color) !important;
   color: var(--primary-dark) !important;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
 }
 
 /* --- MOBILE MENU --- */
@@ -240,6 +244,7 @@ button {
   background-color: var(--logo-color);
   opacity: 0.9;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
 }
 
 /* --- SECTIONS COMMON & Z-INDEX FIX --- */
@@ -325,11 +330,23 @@ button {
   background-color: #fff;
 }
 
+.split-section-inner {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .split-section:hover {
   transform: none;
 }
 
 .split-section.reverse {
+  flex-direction: row-reverse;
+}
+
+.split-section-inner.reverse {
   flex-direction: row-reverse;
 }
 
@@ -371,6 +388,7 @@ button {
   padding: 80px 20px;
   /* Lade till bakgrundsfärg här för att täcka fixed-bilden */
   background-color: var(--light);
+  width: 100%;
 }
 
 .section-header {
@@ -390,17 +408,21 @@ button {
   margin: 0 auto;
 }
 
+.masonry-item {
+  overflow: hidden;
+  border-radius: 2px;
+}
+
 .masonry-item img {
   width: 100%;
   height: 300px;
   object-fit: cover;
-  border-radius: 2px;
-  transition: transform 0.3s;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* .masonry-item img:hover {
-  transform: scale(1.02);
-} */
+.masonry-item img:hover {
+  transform: scale(1.03);
+}
 
 /* NYTT: Galleri Knapp */
 .gallery-button-container {
@@ -460,6 +482,136 @@ button {
   max-width: 1000px;
   margin: 0 auto;
 }
+
+/* --- SUMMER MENU CARD STYLING --- */
+.menu-card {
+  background-image: url('./menu-bg-summer.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 240px 60px 80px 180px;
+  position: relative;
+  text-align: left;
+}
+
+.menu-card-intro {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  color: #666;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.menu-columns-container {
+  display: flex;
+  gap: 50px;
+}
+
+.menu-column-half {
+  flex: 1;
+}
+
+.menu-column-title {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #ffffff;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 8px;
+  margin-bottom: 25px;
+  letter-spacing: 1px;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  margin-bottom: 25px;
+}
+
+.menu-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.menu-item-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.menu-item-price {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.menu-item-desc {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* RESPONSIVE FOR MENU CARD */
+@media (max-width: 768px) {
+  .menu-card {
+    padding: 160px 25px 50px 85px;
+    background-size: 100% auto;
+  }
+  
+  .menu-columns-container {
+    flex-direction: column;
+    gap: 35px;
+  }
+  
+  .menu-card-intro {
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+  
+  .menu-item-title {
+    font-size: 1.15rem;
+  }
+  
+  .menu-item-price {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-card {
+    padding: 110px 15px 40px 65px;
+  }
+  
+  .menu-column-title {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+  
+  .menu-item-title {
+    font-size: 1.05rem;
+  }
+}
+
 
 .yellowh3 {
   font-size: 2.5rem;
@@ -521,6 +673,7 @@ button {
 .booking-section {
   padding: 80px 20px;
   background-color: #fff;
+  width: 100%;
 }
 
 .booking-container {
@@ -671,6 +824,7 @@ button {
   padding: 80px 0 0 0;
   background-color: var(--light);
   text-align: center;
+  width: 100%;
 }
 
 .map-container {
@@ -848,6 +1002,7 @@ button {
   position: relative;
   z-index: 1;
   overflow: hidden;
+  width: 100%;
   /* Prevent scrollbars from messing up layout */
 }
 
@@ -864,12 +1019,16 @@ button {
   /* Enable snap scrolling */
   -webkit-overflow-scrolling: touch;
   /* Smooth scrolling on iOS */
-  max-width: 100%;
-  margin: 0;
+  max-width: 1200px;
+  margin: 0 auto;
 
   /* Hide scrollbar for cleaner look (optional) */
   scrollbar-width: none;
   /* Firefox */
+}
+
+.events-grid.centered {
+  justify-content: center;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
