@@ -9,9 +9,40 @@ import { defaultContent } from './defaultContent';
 import sv from 'date-fns/locale/sv';
 registerLocale('sv', sv);
 
+const ALLERGEN_LIST = [
+    { code: 'GH',  emoji: '🌾', label: 'Gluten' },
+    { code: 'JP',  emoji: '🥜', label: 'Peanøtter' },
+    { code: 'SES', emoji: '🌻', label: 'Sesamfrø' },
+    { code: 'SO',  emoji: '🫘', label: 'Soya' },
+    { code: 'F',   emoji: '🐟', label: 'Fisk' },
+    { code: 'NØ',  emoji: '🌰', label: 'Nøtter' },
+    { code: 'E',   emoji: '🥚', label: 'Egg' },
+    { code: 'SK',  emoji: '🦐', label: 'Skalldyr' },
+    { code: 'SEN', emoji: '🌿', label: 'Sennep' },
+    { code: 'BL',  emoji: '🦑', label: 'Bløtdyr' },
+    { code: 'LUP', emoji: '🌸', label: 'Lupin' },
+    { code: 'M',   emoji: '🥛', label: 'Melk' },
+    { code: 'SEL', emoji: '🥬', label: 'Selleri' },
+    { code: 'SV',  emoji: '🍷', label: 'Svoveldioksyd/Sulfitter' },
+];
+
 const Admin = ({ content, onSave }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [activeTab, setActiveTab] = useState('bookings');
+
+    // SEO: håll admin-sidan utanför sökmotorernas index
+    useEffect(() => {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex, nofollow';
+        document.head.appendChild(meta);
+        const prevTitle = document.title;
+        document.title = 'Admin – Tufte Gård';
+        return () => {
+            document.head.removeChild(meta);
+            document.title = prevTitle;
+        };
+    }, []);
 
     // CONTENT DATA
     const [formData, setFormData] = useState(content);
@@ -60,6 +91,10 @@ const Admin = ({ content, onSave }) => {
     useEffect(() => {
         setFormData(prev => ({
             ...content,
+            hero: {
+                ...defaultContent.hero,
+                ...content.hero
+            },
             menu: {
                 ...content.menu,
                 mainCourses: content.menu.mainCourses || [],
@@ -805,6 +840,21 @@ const Admin = ({ content, onSave }) => {
                             <Input label="Underrubrik" value={formData.hero?.subtitle} onChange={(e) => handleChange('hero', 'subtitle', e.target.value)} />
                             <TextArea label="Text" value={formData.hero?.description} onChange={(e) => handleChange('hero', 'description', e.target.value)} />
                             <Input label="Knapp" value={formData.hero?.buttonText} onChange={(e) => handleChange('hero', 'buttonText', e.target.value)} />
+
+                            <h4 style={{ marginTop: '20px', color: '#c5a059' }}>🕒 Åpningstider (visas högst upp på sidan)</h4>
+                            <Input label="Rubrik (Månedens navn oppdateres automatisk, f.eks. 'Åpningstider i juni')" value={formData.hero?.openingHoursTitle} onChange={(e) => handleChange('hero', 'openingHoursTitle', e.target.value)} />
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: '#aaa', marginBottom: '5px' }}>Rader (en per dag/tidsintervall)</label>
+                            {formData.hero?.openingHours?.map((line, i) => (
+                                <div key={i} style={{ marginBottom: '5px', display: 'flex' }}>
+                                    <input
+                                        value={line}
+                                        onChange={e => handleArrayChange('hero', 'openingHours', i, e.target.value)}
+                                        style={{ flex: 1, padding: '8px', background: '#333', color: '#fff', border: '1px solid #555' }}
+                                    />
+                                    <button onClick={() => handleDeleteItem('hero', 'openingHours', i)} style={{ marginLeft: '5px', color: 'red' }}>X</button>
+                                </div>
+                            ))}
+                            <button onClick={() => handleAddItem('hero', 'openingHours', 'Måndag–Fredag: 12–19')} style={{ fontSize: '0.8rem' }}>+ Rad</button>
                         </div>
 
                         <div className="group-box">
@@ -848,6 +898,58 @@ const Admin = ({ content, onSave }) => {
                                         </select>
                                         <button onClick={() => handleDeleteItem('menu', 'mainCourses', i)} style={{ color: 'red', padding: '8px' }}>X</button>
                                     </div>
+                                    {(() => {
+                                        const bulletCount = (dish.description || '').split('•').length - 1;
+                                        if (bulletCount >= 2) {
+                                            const variantLabels = (dish.description || '').split('•').slice(1).map(s => '• ' + s.trim().substring(0, 40));
+                                            const variantAllergens = dish.variantAllergens || Array.from({ length: bulletCount }, () => []);
+                                            return (
+                                                <div style={{ marginTop: '10px' }}>
+                                                    <label style={{ fontSize: '0.8rem', color: '#c5a059', display: 'block', marginBottom: '8px' }}>Allergener per variant</label>
+                                                    {Array.from({ length: bulletCount }, (_, vi) => (
+                                                        <div key={vi} style={{ marginBottom: '10px', padding: '8px 10px', background: '#2a2a2a', borderLeft: '3px solid #c5a059', borderRadius: '0 4px 4px 0' }}>
+                                                            <label style={{ fontSize: '0.75rem', color: '#c5a059', display: 'block', marginBottom: '6px' }}>{variantLabels[vi] || `Variant ${vi + 1}`}</label>
+                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                                                {ALLERGEN_LIST.map(({ code, emoji, label }) => {
+                                                                    const checked = (variantAllergens[vi] || []).includes(code);
+                                                                    return (
+                                                                        <label key={code} title={label} style={{ display: 'flex', alignItems: 'center', background: checked ? '#c5a059' : '#444', color: checked ? '#000' : '#ccc', padding: '3px 9px', borderRadius: '12px', cursor: 'pointer', fontSize: '1rem', userSelect: 'none' }}>
+                                                                            <input type="checkbox" checked={checked} onChange={e => {
+                                                                                const updated = Array.from({ length: bulletCount }, (_, k) => [...(variantAllergens[k] || [])]);
+                                                                                updated[vi] = e.target.checked ? [...updated[vi], code] : updated[vi].filter(c => c !== code);
+                                                                                handleObjectArrayChange('menu', 'mainCourses', i, 'variantAllergens', updated);
+                                                                            }} style={{ display: 'none' }} />
+                                                                            {emoji}
+                                                                        </label>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        }
+                                        return (
+                                            <div style={{ marginTop: '8px' }}>
+                                                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '5px' }}>Allergener</label>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                                    {ALLERGEN_LIST.map(({ code, emoji, label }) => {
+                                                        const checked = (dish.allergens || []).includes(code);
+                                                        return (
+                                                            <label key={code} title={label} style={{ display: 'flex', alignItems: 'center', background: checked ? '#c5a059' : '#444', color: checked ? '#000' : '#ccc', padding: '3px 9px', borderRadius: '12px', cursor: 'pointer', fontSize: '1rem', userSelect: 'none' }}>
+                                                                <input type="checkbox" checked={checked} onChange={e => {
+                                                                    const current = dish.allergens || [];
+                                                                    const updated = e.target.checked ? [...current, code] : current.filter(c => c !== code);
+                                                                    handleObjectArrayChange('menu', 'mainCourses', i, 'allergens', updated);
+                                                                }} style={{ display: 'none' }} />
+                                                                {emoji}
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
                                     <div style={{ marginTop: '5px', display: 'flex', alignItems: 'center', gap: '15px' }}>
                                         <div>
                                             <label style={{ fontSize: '0.8rem', color: '#aaa', marginRight: '5px' }}>Datumstyrd:</label>
@@ -964,7 +1066,7 @@ const Admin = ({ content, onSave }) => {
                         <div key={i} style={{ background: '#333', padding: '15px', marginBottom: '15px', borderRadius: '4px', border: '1px solid #444' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
                                 <Input label="Titel" value={event.title} onChange={(e) => handleObjectArrayChange('events', null, i, 'title', e.target.value)} />
-                                <Input label="Datum (Text, t.ex '14. Feb')" value={event.date} onChange={(e) => handleObjectArrayChange('events', null, i, 'date', e.target.value)} />
+                                <Input label="Datum (t.ex. '15 Juni' eller '15. Juni')" value={event.date} onChange={(e) => handleObjectArrayChange('events', null, i, 'date', e.target.value)} />
                             </div>
                             <TextArea label="Beskrivning" value={event.description} onChange={(e) => handleObjectArrayChange('events', null, i, 'description', e.target.value)} />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>

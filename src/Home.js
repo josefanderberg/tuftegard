@@ -42,6 +42,30 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     );
 };
 
+const getDynamicOpeningHoursTitle = (title) => {
+    if (!title) return "";
+    const monthsNO = ["januar", "februar", "mars", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "desember"];
+    const monthsSV = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
+    
+    const currentMonthIndex = new Date().getMonth();
+    const currentMonthNO = monthsNO[currentMonthIndex];
+    const currentMonthSV = monthsSV[currentMonthIndex];
+    
+    // Match any Norwegian/Swedish month name (case-insensitive)
+    const monthRegex = /(januar[i]?|februar[i]?|mars|april|ma[ij]|juni|juli|august[i]?|september|oktober|november|de[cs]ember)/gi;
+    
+    return title.replace(monthRegex, (match) => {
+        const isSwedish = match.toLowerCase().endsWith('i') || match.toLowerCase() === 'maj' || match.toLowerCase() === 'december';
+        const isCapitalized = match[0] === match[0].toUpperCase();
+        
+        let replacement = isSwedish ? currentMonthSV : currentMonthNO;
+        if (isCapitalized) {
+            replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+        }
+        return replacement;
+    });
+};
+
 const Home = ({ content: propContent }) => {
     // ... (rest of imports/state) ...
 
@@ -50,6 +74,10 @@ const Home = ({ content: propContent }) => {
     const content = {
         ...defaultContent,
         ...propContent,
+        hero: {
+            ...defaultContent.hero,
+            ...(propContent.hero || {})
+        },
         intro: {
             ...defaultContent.intro,
             ...(propContent.intro || {})
@@ -71,7 +99,6 @@ const Home = ({ content: propContent }) => {
 
     // --- BOKNING STATE ---
     const [bookingDate, setBookingDate] = useState(null);
-    const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 
     // Lista på datum som är fulla (>= 5 bokningar)
     const [fullyBookedDates, setFullyBookedDates] = useState([]);
@@ -80,7 +107,7 @@ const Home = ({ content: propContent }) => {
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
-        guests: 4,
+        guests: '',
         time: '',
         notes: '',
         dishes: {}
@@ -131,31 +158,7 @@ const Home = ({ content: propContent }) => {
         }
     };
 
-    // Uppdatera tillgängliga tider när datum ändras
-    useEffect(() => {
-        if (!bookingDate) {
-            setAvailableTimeSlots([]);
-            return;
-        }
-
-        const day = bookingDate.getDay(); // 0 = Söndag
-        let slots = [];
-        const standardTimes = content.booking?.standardTimes || ["18:00"];
-        const sundayTimes = content.booking?.sundayTimes || ["15:00"];
-
-        if (day === 0) {
-            slots = sundayTimes;
-        } else {
-            slots = standardTimes;
-        }
-        setAvailableTimeSlots(slots);
-
-        if (slots.length > 0) {
-            setFormData(prev => ({ ...prev, time: slots[0] }));
-        }
-    }, [bookingDate, content.booking]);
-
-    const scrollToSection = (id) => {
+    const scrollToSection = (id, extraOffset = 0) => {
         setMenuOpen(false);
         const element = document.getElementById(id);
         if (element) {
@@ -163,13 +166,14 @@ const Home = ({ content: propContent }) => {
             const bodyRect = document.body.getBoundingClientRect().top;
             const elementRect = element.getBoundingClientRect().top;
             const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
+            const offsetPosition = elementPosition - offset + extraOffset;
 
             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         }
     };
 
     const [galleryFilter, setGalleryFilter] = useState('sommar');
+    const [showAllergens, setShowAllergens] = useState(false);
 
     const allGalleryImages = content.gallery?.images || [];
     const displayedGalleryImages = allGalleryImages.filter(img => {
@@ -191,6 +195,24 @@ const Home = ({ content: propContent }) => {
                 [dishTitle]: parseInt(count)
             }
         }));
+    };
+
+    // Gör telefonnummer i en text klickbara (tel:-länk)
+    const renderWithPhoneLinks = (text) => {
+        if (!text) return text;
+        const parts = text.split(/(\d[\d\s]{4,}\d)/g);
+        return parts.map((part, i) => {
+            if (/^\d[\d\s]{4,}\d$/.test(part)) {
+                const digits = part.replace(/\s/g, '');
+                const tel = digits.startsWith('+') ? digits : `+47${digits}`;
+                return (
+                    <a key={i} href={`tel:${tel}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
+                        {part}
+                    </a>
+                );
+            }
+            return part;
+        });
     };
 
     // --- POPUP STATE ---
@@ -269,7 +291,83 @@ const Home = ({ content: propContent }) => {
     const closeConfirmation = () => {
         setShowConfirmation(false);
         setBookingDate(null);
-        setFormData({ name: '', phone: '', guests: 4, time: '', notes: '', dishes: {} });
+        setFormData({ name: '', phone: '', guests: '', time: '', notes: '', dishes: {} });
+    };
+
+    const ALLERGENS = {
+        'GH':  { emoji: '🌾', label: 'Gluten' },
+        'JP':  { emoji: '🥜', label: 'Peanøtter' },
+        'SES': { emoji: '🌻', label: 'Sesamfrø' },
+        'SO':  { emoji: '🫘', label: 'Soya' },
+        'F':   { emoji: '🐟', label: 'Fisk' },
+        'NØ':  { emoji: '🌰', label: 'Nøtter' },
+        'E':   { emoji: '🥚', label: 'Egg' },
+        'SK':  { emoji: '🦐', label: 'Skalldyr' },
+        'SEN': { emoji: '🌿', label: 'Sennep' },
+        'BL':  { emoji: '🦑', label: 'Bløtdyr' },
+        'LUP': { emoji: '🌸', label: 'Lupin' },
+        'M':   { emoji: '🥛', label: 'Melk' },
+        'SEL': { emoji: '🥬', label: 'Selleri' },
+        'SV':  { emoji: '🍷', label: 'Svoveldioksyd/Sulfitter' },
+    };
+
+    const extractAllergens = (item) => {
+        return (item.allergens || []).filter(code => ALLERGENS[code]);
+    };
+
+    const parseLines = (text) => {
+        if (!text) return [];
+        return text.split('\n').flatMap(line => {
+            if (!line.includes('•')) return [{ isBullet: false, text: line.replace(/\s*\([^)]+\)/g, '') }];
+            const segments = line.split('•');
+            const result = [];
+            if (segments[0].trim()) result.push({ isBullet: false, text: segments[0].trim() });
+            for (let j = 1; j < segments.length; j++) {
+                if (segments[j].trim()) result.push({ isBullet: true, text: '• ' + segments[j].trim().replace(/\s*\([^)]+\)/g, '') });
+            }
+            return result;
+        });
+    };
+
+    const renderMenuItemContent = (item) => {
+        const lines = parseLines(item.description);
+        const hasVariants = item.variantAllergens && item.variantAllergens.length > 0;
+        let bulletIdx = 0;
+        return (
+            <>
+                {lines.map((line, i) => {
+                    if (line.isBullet && hasVariants && showAllergens) {
+                        const codes = (item.variantAllergens[bulletIdx] || []).filter(c => ALLERGENS[c]);
+                        bulletIdx++;
+                        return (
+                            <div key={i} style={{ marginTop: '6px' }}>
+                                <span style={{ display: 'block', fontWeight: 'bold', color: '#fff' }}>{line.text}</span>
+                                {codes.length > 0 && (
+                                    <div style={{ display: 'flex', gap: '3px', marginTop: '3px', paddingLeft: '10px' }}>
+                                        {codes.map(code => (
+                                            <span key={code} title={ALLERGENS[code].label} style={{ fontSize: '0.9rem' }}>{ALLERGENS[code].emoji}</span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    }
+                    if (line.isBullet && hasVariants && !showAllergens) bulletIdx++;
+                    return (
+                        <span key={i} style={{ display: 'block', fontWeight: line.isBullet ? 'bold' : undefined, color: line.isBullet ? '#fff' : undefined, marginTop: line.isBullet && i > 0 ? '4px' : undefined }}>
+                            {line.text}
+                        </span>
+                    );
+                })}
+                {showAllergens && !hasVariants && extractAllergens(item).length > 0 && (
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
+                        {extractAllergens(item).map(code => (
+                            <span key={code} title={ALLERGENS[code].label} style={{ fontSize: '1rem', cursor: 'default' }}>{ALLERGENS[code].emoji}</span>
+                        ))}
+                    </div>
+                )}
+            </>
+        );
     };
 
     return (
@@ -283,10 +381,11 @@ const Home = ({ content: propContent }) => {
                         <span className="bar"></span><span className="bar"></span><span className="bar"></span>
                     </button>
                     <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
-                        <button onClick={() => scrollToSection('arrangemant')}>Arrangement</button>
-                        <button onClick={() => scrollToSection('galleri')}>Galleri</button>
-                        <button onClick={() => scrollToSection('meny')}>Mat & Drikke</button>
-                        <button onClick={() => scrollToSection('kontakt')} className="btn-book">Reservera</button>
+                        <a href="#arrangemant" onClick={(e) => { e.preventDefault(); scrollToSection('arrangemant'); }}>Arrangement</a>
+                        <a href="#galleri" onClick={(e) => { e.preventDefault(); scrollToSection('galleri'); }}>Galleri</a>
+                        <a href="#meny" onClick={(e) => { e.preventDefault(); scrollToSection('meny'); }}>Mat & Drikke</a>
+                        <a href="#hitta-hit" onClick={(e) => { e.preventDefault(); scrollToSection('hitta-hit'); }}>Finn frem</a>
+                        <a href="#kontakt" onClick={(e) => { e.preventDefault(); scrollToSection('kontakt'); }} className="btn-book">Send forespørsel</a>
                     </nav>
                 </div>
             </header>
@@ -294,17 +393,17 @@ const Home = ({ content: propContent }) => {
             <section id="hjem" className="hero">
                 <div className="hero-content">
                     <span className="subtitle">{content.hero.subtitle}</span>
-                    <h2>{content.hero.title}</h2>
+                    <h1>{content.hero.title}</h1>
                     <p>{content.hero.description}</p>
-                    <button className="btn-primary" onClick={() => scrollToSection('galleri')}>Opplev Sesongens Tilbud</button>
+                    <button className="btn-primary" onClick={() => scrollToSection('meny', 70)}>{content.hero.buttonText || "Opplev Sesongens Tilbud"}</button>
                 </div>
 
                 <div className="hero-opening-hours">
-                    <span className="opening-hours-title">Åpningstider</span>
+                    <span className="opening-hours-title">{getDynamicOpeningHoursTitle(content.hero.openingHoursTitle)}</span>
                     <div className="opening-hours-list">
-                        <div>Onsdag–Torsdag: 12–19</div>
-                        <div>Fredag–Lørdag: 12–22</div>
-                        <div>Søndag: 12–18</div>
+                        {(content.hero.openingHours || []).map((line, i) => (
+                            <div key={i}>{line}</div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -315,7 +414,7 @@ const Home = ({ content: propContent }) => {
             {/* --- SEKTION 1: INTRO / FILOSOFI (Only Label + Symbol) --- */}
             <section className="text-center" style={{ padding: '80px 20px 40px', backgroundColor: '#fff', position: 'relative', zIndex: 1, width: '100%' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.mainTitle}</h3>
+                    <h2 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.mainTitle}</h2>
                     <p style={{ whiteSpace: 'pre-line' }}>{content.intro.mainDescription}</p>
                     <div className="divider" style={{ marginTop: '30px' }}>🍒</div>
                 </div>
@@ -328,7 +427,7 @@ const Home = ({ content: propContent }) => {
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-right">
-                        <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.gardenTitle}</h3>
+                        <h2 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.gardenTitle}</h2>
                         <p style={{ whiteSpace: 'pre-line' }}>{content.intro.gardenText}</p>
                     </RevealOnScroll>
                 </div>
@@ -341,7 +440,7 @@ const Home = ({ content: propContent }) => {
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-left">
-                        <h3 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.foodTitle}</h3>
+                        <h2 className="section-title" style={{ marginBottom: '20px' }}>{content.intro.foodTitle}</h2>
                         <p style={{ whiteSpace: 'pre-line' }}>{content.intro.foodText}</p>
                     </RevealOnScroll>
                 </div>
@@ -351,45 +450,56 @@ const Home = ({ content: propContent }) => {
             <section id="arrangemant" className="events-section">
                 <div className="section-header">
                     <span className="label">Dette skjer på gården</span>
-                    <h3>Kommende Arrangemeng</h3>
+                    <h2>Kommende Arrangement</h2>
                     <p>Sett av datoen for våre spesielle kvelder.</p>
                 </div>
 
                 {(() => {
                     const visibleEvents = (content.events || []).filter(e => !e.hidden);
-                    const isCentered = visibleEvents.length > 0 && visibleEvents.length <= 2;
+                    const isCentered = visibleEvents.length <= 2;
                     return (
                         <div className={`events-grid ${isCentered ? 'centered' : ''}`}>
-                            {visibleEvents.map((event, index) => (
-                                <RevealOnScroll className="event-card" key={index} style={{ transitionDelay: `${index * 0.2}s` }}>
-                                    <div className="event-date-large">
-                                        <span className="day">{event.date?.split('.')[0] || '14'}</span>
-                                        <span className="month">{event.date?.split('.')[1] || 'Feb'}</span>
-                                    </div>
-                                    <h4>{event.title}</h4>
-                                    <p>{event.description}</p>
-                                    <span
-                                        onClick={() => {
-                                            if (event.bookingDate) {
-                                                setBookingDate(new Date(`${event.bookingDate}T12:00:00`));
-                                            }
-                                            scrollToSection('kontakt');
-                                        }}
-                                        className="btn-event"
-                                    >
-                                        Bestill Bord
-                                    </span>
-                                </RevealOnScroll>
-                            ))}
+                            {visibleEvents.map((event, index) => {
+                                const dateParts = event.date?.trim().split(/[\s.]+/) || [];
+                                let day = '14';
+                                let month = 'Feb';
+                                if (dateParts.length >= 2) {
+                                    day = dateParts[0];
+                                    month = dateParts[1];
+                                } else if (dateParts.length === 1 && dateParts[0]) {
+                                    const val = dateParts[0];
+                                    if (/^\d+/.test(val)) {
+                                        day = val;
+                                        month = 'Feb';
+                                    } else {
+                                        day = '--';
+                                        month = val;
+                                    }
+                                }
+                                return (
+                                    <RevealOnScroll className="event-card" key={index} style={{ transitionDelay: `${index * 0.2}s` }}>
+                                        <div className="event-date-large">
+                                            <span className="day">{day}</span>
+                                            <span className="month">{month}</span>
+                                        </div>
+                                        <h4>{event.title}</h4>
+                                        <p>{event.description}</p>
+                                        
+                                        <h4>
+                                            Bestill på: 46824498
+                                        </h4>
+                                    </RevealOnScroll>
+                                );
+                            })}
                             {visibleEvents.length === 0 && (
-                                <RevealOnScroll className="event-card" style={{ gridColumn: '1/-1', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+                                <RevealOnScroll className="event-card" style={{ flex: '0 1 500px', width: '100%', maxWidth: '500px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
                                     <div className="event-date-large" style={{ opacity: 0.5 }}>
                                         <span className="day">--</span>
                                         <span className="month">--</span>
                                     </div>
-                                    <h4>Inga planlagde arrangement</h4>
-                                    <p>Akkurat no har me ingen fastsette datoar, men følg med – det kjem meir!</p>
-                                    <span onClick={() => scrollToSection('kontakt')} className="btn-event">Ta kontakt for spørsmål</span>
+                                    <h4>Ingen planlagte arrangement</h4>
+                                    <p>Vi har ingen planlagte arrangement akkurat nå, men det kommer snart mer. Følg med her eller i sosiale medier for nye datoer.</p>
+                                    <span onClick={() => scrollToSection('kontakt')} className="btn-event">Har du spørsmål? Ta gjerne kontakt!</span>
                                 </RevealOnScroll>
                             )}
                         </div>
@@ -400,7 +510,7 @@ const Home = ({ content: propContent }) => {
             {/* --- GALLERI MED DYNAMISK TEXT --- */}
             <section id="galleri" className="gallery-section">
                 <div className="section-header">
-                    <h3>{content.gallery.title}</h3>
+                    <h2>{content.gallery.title}</h2>
                     <div className="gallery-filter-buttons" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
                         <button
                             onClick={() => { setGalleryFilter('sommar'); setVisibleImagesCount(6); }}
@@ -449,7 +559,6 @@ const Home = ({ content: propContent }) => {
                             <h4 style={{ fontSize: '1.8rem', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>{content.summer?.title}</h4>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '15px' }}>{content.summer?.textPart1}</p>
                             <p style={{ whiteSpace: 'pre-line', marginBottom: '20px' }}>{content.summer?.textPart2}</p>
-                            <button className="btn-primary" style={{ marginTop: '20px' }} onClick={() => scrollToSection('kontakt')}>Reserver bord</button>
                         </RevealOnScroll>
                     )}
                 </div>
@@ -473,9 +582,17 @@ const Home = ({ content: propContent }) => {
             <section id="meny" className="menu-section" style={{ backgroundImage: "url('/tufte2.png')" }}>
                 <div className="menu-overlay"></div>
                 <div className="menu-content-wrapper" style={{ maxWidth: '1100px', width: '100%' }}>
-                    <span className="label" style={{ color: 'var(--gold)' }}>{content.menu.label}</span>
-                    <h3 className="yellowh3">{content.menu.title}</h3>
-                    <p className="menu-intro">{content.menu.intro}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                        <span className="label" style={{ color: 'var(--gold)' }}>{content.menu.label}</span>
+                        <button
+                            onClick={() => setShowAllergens(v => !v)}
+                            style={{ background: showAllergens ? 'var(--gold)' : 'transparent', color: showAllergens ? '#1a1a1a' : 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '20px', padding: '5px 14px', fontSize: '0.78rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                        >
+                            {showAllergens ? 'Skjul allergener' : 'Vis allergener'}
+                        </button>
+                    </div>
+                    <h2 className="yellowh3">{content.menu.title}</h2>
+                    <p className="menu-intro">{(content.menu.intro || '').replace(/Tufte Gård/g, 'Tufte Gård')}</p>
                     
                     <div className="menu-columns-container">
                         {(() => {
@@ -511,15 +628,9 @@ const Home = ({ content: propContent }) => {
                                                         <span className="menu-item-title">{item.title}</span>
                                                         {item.price && <span className="menu-item-price">{item.price}</span>}
                                                     </div>
-                                                    <p className="menu-item-desc">
-                                                        {item.description && item.description.split('\n').map((line, i) => {
-                                                            const trimmed = line.trim();
-                                                            if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
-                                                                return <span key={i} style={{ display: 'block', fontWeight: 'bold', color: '#ffffff', marginTop: '4px' }}>{line}</span>;
-                                                            }
-                                                            return <span key={i} style={{ display: 'block' }}>{line}</span>;
-                                                        })}
-                                                    </p>
+                                                    <div className="menu-item-desc">
+                                                        {renderMenuItemContent(item)}
+                                                    </div>
                                                 </li>
                                             ))}
                                         </ul>
@@ -533,15 +644,9 @@ const Home = ({ content: propContent }) => {
                                                         <span className="menu-item-title">{item.title}</span>
                                                         {item.price && <span className="menu-item-price">{item.price}</span>}
                                                     </div>
-                                                    <p className="menu-item-desc">
-                                                        {item.description && item.description.split('\n').map((line, i) => {
-                                                            const trimmed = line.trim();
-                                                            if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
-                                                                return <span key={i} style={{ display: 'block', fontWeight: 'bold', color: '#ffffff', marginTop: '4px' }}>{line}</span>;
-                                                            }
-                                                            return <span key={i} style={{ display: 'block' }}>{line}</span>;
-                                                        })}
-                                                    </p>
+                                                    <div className="menu-item-desc">
+                                                        {renderMenuItemContent(item)}
+                                                    </div>
                                                 </li>
                                             ))}
                                         </ul>
@@ -550,6 +655,18 @@ const Home = ({ content: propContent }) => {
                             );
                         })()}
                     </div>
+
+                    {showAllergens && <div style={{ marginTop: '35px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+                        <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px' }}>Allergener</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            {Object.entries(ALLERGENS).map(([code, { emoji, label }]) => (
+                                <span key={code} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>
+                                    <span style={{ fontSize: '1.1rem' }}>{emoji}</span>
+                                    <span>{label}</span>
+                                </span>
+                            ))}
+                        </div>
+                    </div>}
 
                     <p className="menu-info-note" style={{ marginTop: '40px', textAlign: 'center', fontSize: 'var(--fs-base)', color: 'var(--gold)', fontStyle: 'italic' }}>
                         Vi har drop-in, men om dere er et større selskap må dere gjerne reservere bord.
@@ -560,7 +677,7 @@ const Home = ({ content: propContent }) => {
 
             <section id="kontakt" className="booking-section">
                 <div className="booking-container">
-                    <h3>{content.booking?.title}</h3>
+                    <h2>{content.booking?.title}</h2>
                     <p>{content.booking?.subtitle}</p>
 
                     <form className="booking-form" onSubmit={handleSubmitBooking}>
@@ -613,24 +730,28 @@ const Home = ({ content: propContent }) => {
                         </div>
 
                         <div className="input-grid-row">
-                            <select required value={formData.guests} onChange={e => setFormData({ ...formData, guests: e.target.value })}>
-                                {Array.from({ length: 17 }, (_, i) => i + 4).map(num => (
-                                    <option key={num} value={num}>{num} personer</option>
-                                ))}
-                            </select>
-                            <select required value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} disabled={!bookingDate}>
-                                <option value="" disabled>Velg tid...</option>
-                                {availableTimeSlots.map((slot, index) => (
-                                    <option key={index} value={slot}>{slot}</option>
-                                ))}
-                            </select>
+                            <input
+                                type="number"
+                                min="1"
+                                required
+                                placeholder="Antall personer"
+                                value={formData.guests}
+                                onChange={e => setFormData({ ...formData, guests: e.target.value })}
+                            />
+                            <input
+                                type="text"
+                                required
+                                placeholder="Ca. når kommer dere? (f.eks. 18:30)"
+                                value={formData.time}
+                                onChange={e => setFormData({ ...formData, time: e.target.value })}
+                            />
                         </div>
 
                         <textarea placeholder="Har du allergener eller andre ønsker? Legg igjen en kommentar." value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} style={{ marginBottom: '20px' }}></textarea>
                         
                         <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={submitting}>{submitting ? "Sender..." : "Send forespørsel"}</button>
                     </form>
-                    <p className="booking-info" style={{ marginTop: '20px' }}>{content.booking.contactInfo}</p>
+                    <p className="booking-info" style={{ marginTop: '20px' }}>{renderWithPhoneLinks(content.booking.contactInfo)}</p>
                 </div>
             </section>
 
@@ -638,7 +759,7 @@ const Home = ({ content: propContent }) => {
 
             <section id="hitta-hit" className="map-section">
                 <div className="section-header">
-                    <h3>Finn frem</h3>
+                    <h2>Finn frem</h2>
                 </div>
                 <div className="map-container" style={{ height: '500px' }}>
                     <iframe
@@ -648,7 +769,7 @@ const Home = ({ content: propContent }) => {
                         scrolling="no"
                         marginHeight="0"
                         marginWidth="0"
-                        src="https://maps.google.com/maps?width=100%25&height=500&hl=en&q=Tufte%20G%C3%A5rd,%20Ulefoss&t=&z=14&ie=UTF8&iwloc=B&output=embed"
+                        src="https://maps.google.com/maps?width=100%25&height=500&hl=no&q=Tufte%20G%C3%A5rd,%20Ulefoss&t=&z=14&ie=UTF8&iwloc=B&output=embed"
                         title="Tufte Gård Map"
                     ></iframe>
                 </div>
@@ -663,7 +784,7 @@ const Home = ({ content: propContent }) => {
                             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" /></svg>
                         </a>
                     </div>
-                    <p>{content.footer.text}</p>
+                    <p>Tufte Gård © 2025 | Kaféen på Fen</p>
                 </div>
             </footer>
             {

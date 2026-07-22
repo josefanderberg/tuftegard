@@ -57,12 +57,14 @@ function App() {
     // 2. Spara till Firebase (om konfigurerat)
     if (db) {
       try {
-        await setDoc(doc(db, "content", "main"), newContent);
+        // Strip undefined values — Firestore rejects them
+        const clean = JSON.parse(JSON.stringify(newContent));
+        await setDoc(doc(db, "content", "main"), clean);
         console.log("Saved content to Firebase!");
         return true; // Return success status
       } catch (e) {
         console.error("Error adding document: ", e);
-        alert("Kunde inte spara till molnet (Firebase). Kontrollera dina inställningar.");
+        alert("Firebase-fel: " + e.code + "\n" + e.message);
         return false;
       }
     } else {

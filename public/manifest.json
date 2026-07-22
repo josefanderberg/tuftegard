@@ -1,6 +1,8 @@
 {
   "short_name": "Tufte Gård",
-  "name": "Tufte Gård",
+  "name": "Tufte Gård – Morellgård og gårdskafé",
+  "description": "Familiedrevet morellgård og gårdskafé på Fen ved Ulefoss i Telemark.",
+  "lang": "no",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +22,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#1a1a1a",
   "background_color": "#ffffff"
 }

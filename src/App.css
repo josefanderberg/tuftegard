@@ -94,7 +94,8 @@ button {
   gap: 30px;
 }
 
-.nav-menu button {
+.nav-menu button,
+.nav-menu a {
   background: none;
   border: none;
   color: var(--light);
@@ -102,9 +103,13 @@ button {
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: color 0.3s;
+  text-decoration: none;
+  font-family: var(--font-serif);
+  cursor: pointer;
 }
 
-.nav-menu button:hover {
+.nav-menu button:hover,
+.nav-menu a:hover {
   color: var(--gold);
 }
 
@@ -256,7 +261,7 @@ button {
 
   .hero-opening-hours {
     position: absolute;
-    bottom: 30px;
+    bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -285,7 +290,7 @@ button {
   color: #ffffff;
 }
 
-.hero h2 {
+.hero h1 {
   font-size: var(--fs-display);
   margin-bottom: 20px;
   line-height: 1.2;
@@ -457,6 +462,7 @@ button {
   justify-content: center;
 }
 
+.split-content h2,
 .split-content h3 {
   font-size: var(--fs-xxl);
   margin-bottom: 20px;
@@ -475,6 +481,7 @@ button {
   margin-bottom: 50px;
 }
 
+.section-header h2,
 .section-header h3 {
   font-size: var(--fs-xxl);
 }
@@ -770,6 +777,11 @@ button {
   text-align: center;
 }
 
+/* Samma storlek som tidigare h3 — rubriken är h2 för SEO-hierarkin */
+.booking-container h2 {
+  font-size: 1.17rem;
+}
+
 .booking-form {
   margin-top: 40px;
   display: flex;
@@ -944,7 +956,7 @@ button {
 
 /* --- RESPONSIVE FIXES --- */
 @media (max-width: 600px) {
-  .hero h2 {
+  .hero h1 {
     font-size: 2.5rem;
   }
 

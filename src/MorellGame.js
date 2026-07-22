@@ -65,6 +65,7 @@ const MorellGame = () => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const canvasRef = useRef(null);
+    const bgCanvasRef = useRef(null);
     const gameAreaRef = useRef(null);
     const basketRef = useRef({ x: 270, y: 350, width: 55, height: 40 });
     const cherriesRef = useRef([]);
@@ -114,16 +115,38 @@ const MorellGame = () => {
         }, 1200);
     };
 
-    const triggerSuccessPopup = () => {
+    const triggerSuccessPopup = (currentScore) => {
+        let text = "";
+        let duration = 1500;
+
+        if (currentScore === 10) {
+            text = "Wohoo!";
+            duration = 1200;
+        } else if (currentScore === 20) {
+            text = "Skal du begynne å jobbe her?";
+            duration = 2500;
+        } else if (currentScore === 30) {
+            text = "WTF!";
+            duration = 1200;
+        } else if (currentScore === 40) {
+            text = "Legg av!";
+            duration = 1200;
+        } else if (currentScore >= 50 && currentScore % 10 === 0) {
+            text = `${currentScore}!`;
+            duration = 1200;
+        } else {
+            return;
+        }
+
         setSuccessPopup({
             visible: true,
-            text: "Du klarer deg bra! Fortsett å kjempe! 🍒"
+            text: text
         });
 
         if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
         successTimeoutRef.current = setTimeout(() => {
             setSuccessPopup(prev => ({ ...prev, visible: false }));
-        }, 3000);
+        }, duration);
     };
 
 
@@ -136,6 +159,20 @@ const MorellGame = () => {
             if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
         };
     }, []);
+
+    // Disable page scrolling while playing the game
+    useEffect(() => {
+        if (isPlaying && isExpanded) {
+            const originalBodyOverflow = document.body.style.overflow;
+            const originalHtmlOverflow = document.documentElement.style.overflow;
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalBodyOverflow;
+                document.documentElement.style.overflow = originalHtmlOverflow;
+            };
+        }
+    }, [isPlaying, isExpanded]);
 
     const fetchHighscores = async () => {
         setLoadingLeaderboard(true);
@@ -275,91 +312,94 @@ const MorellGame = () => {
             return;
         }
 
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const fgCanvas = canvasRef.current;
+        const bgCanvas = bgCanvasRef.current;
+        if (!fgCanvas || !bgCanvas) return;
+        const fgCtx = fgCanvas.getContext('2d');
+        const bgCtx = bgCanvas.getContext('2d');
 
         let spawnTimer = 0;
         let speedMultiplier = 1;
 
         const updateAndRender = () => {
-            // Clear canvas
-            ctx.clearRect(0, 0, 600, 400);
+            // Clear canvases
+            bgCtx.clearRect(0, 0, 600, 400);
+            fgCtx.clearRect(0, 0, 600, 400);
 
             // Canvas background is transparent so commentary popups render behind it
 
             // 1. Draw Background Canopy (very dark green for depth)
-            ctx.fillStyle = '#0f2418';
-            ctx.beginPath();
-            ctx.arc(80, 50, 90, 0, Math.PI * 2);
-            ctx.arc(220, 40, 110, 0, Math.PI * 2);
-            ctx.arc(380, 40, 120, 0, Math.PI * 2);
-            ctx.arc(540, 60, 100, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.fillStyle = '#0f2418';
+            bgCtx.beginPath();
+            bgCtx.arc(80, 50, 90, 0, Math.PI * 2);
+            bgCtx.arc(220, 40, 110, 0, Math.PI * 2);
+            bgCtx.arc(380, 40, 120, 0, Math.PI * 2);
+            bgCtx.arc(540, 60, 100, 0, Math.PI * 2);
+            bgCtx.fill();
 
             // 2. Draw Tree Trunk (brown, left side)
-            ctx.fillStyle = '#3a2218';
-            ctx.beginPath();
-            ctx.moveTo(0, 400);
-            ctx.quadraticCurveTo(50, 250, 20, 0);
-            ctx.lineTo(50, 0);
-            ctx.quadraticCurveTo(80, 250, 45, 400);
-            ctx.fill();
+            bgCtx.fillStyle = '#3a2218';
+            bgCtx.beginPath();
+            bgCtx.moveTo(0, 400);
+            bgCtx.quadraticCurveTo(50, 250, 20, 0);
+            bgCtx.lineTo(50, 0);
+            bgCtx.quadraticCurveTo(80, 250, 45, 400);
+            bgCtx.fill();
 
             // 3. Draw Branches extending out
-            ctx.lineWidth = 8;
-            ctx.strokeStyle = '#3a2218';
+            bgCtx.lineWidth = 8;
+            bgCtx.strokeStyle = '#3a2218';
             
             // Major Branch 1 (middle height)
-            ctx.beginPath();
-            ctx.moveTo(40, 200);
-            ctx.quadraticCurveTo(180, 160, 320, 140);
-            ctx.stroke();
+            bgCtx.beginPath();
+            bgCtx.moveTo(40, 200);
+            bgCtx.quadraticCurveTo(180, 160, 320, 140);
+            bgCtx.stroke();
 
             // Sub-branches from Major Branch 1
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(180, 163);
-            ctx.quadraticCurveTo(220, 210, 260, 230);
-            ctx.moveTo(250, 148);
-            ctx.quadraticCurveTo(280, 100, 310, 90);
-            ctx.stroke();
+            bgCtx.lineWidth = 4;
+            bgCtx.beginPath();
+            bgCtx.moveTo(180, 163);
+            bgCtx.quadraticCurveTo(220, 210, 260, 230);
+            bgCtx.moveTo(250, 148);
+            bgCtx.quadraticCurveTo(280, 100, 310, 90);
+            bgCtx.stroke();
 
             // Major Branch 2 (upper height)
-            ctx.lineWidth = 6;
-            ctx.beginPath();
-            ctx.moveTo(30, 100);
-            ctx.quadraticCurveTo(150, 80, 250, 40);
-            ctx.stroke();
+            bgCtx.lineWidth = 6;
+            bgCtx.beginPath();
+            bgCtx.moveTo(30, 100);
+            bgCtx.quadraticCurveTo(150, 80, 250, 40);
+            bgCtx.stroke();
             
             // Branch 3 (right side top hanging in)
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            ctx.moveTo(600, 30);
-            ctx.quadraticCurveTo(450, 50, 380, 90);
-            ctx.stroke();
+            bgCtx.lineWidth = 5;
+            bgCtx.beginPath();
+            bgCtx.moveTo(600, 30);
+            bgCtx.quadraticCurveTo(450, 50, 380, 90);
+            bgCtx.stroke();
 
             // 4. Draw Foreground Leaves (medium and lighter greens to create depth)
-            ctx.fillStyle = '#1b3f27'; // Medium forest green
-            ctx.beginPath();
-            ctx.arc(60, 30, 50, 0, Math.PI * 2);
-            ctx.arc(140, 40, 65, 0, Math.PI * 2);
-            ctx.arc(280, 50, 75, 0, Math.PI * 2);
-            ctx.arc(420, 60, 80, 0, Math.PI * 2);
-            ctx.arc(520, 40, 70, 0, Math.PI * 2);
-            ctx.arc(260, 230, 35, 0, Math.PI * 2);
-            ctx.arc(320, 140, 40, 0, Math.PI * 2);
-            ctx.arc(380, 90, 35, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.fillStyle = '#1b3f27'; // Medium forest green
+            bgCtx.beginPath();
+            bgCtx.arc(60, 30, 50, 0, Math.PI * 2);
+            bgCtx.arc(140, 40, 65, 0, Math.PI * 2);
+            bgCtx.arc(280, 50, 75, 0, Math.PI * 2);
+            bgCtx.arc(420, 60, 80, 0, Math.PI * 2);
+            bgCtx.arc(520, 40, 70, 0, Math.PI * 2);
+            bgCtx.arc(260, 230, 35, 0, Math.PI * 2);
+            bgCtx.arc(320, 140, 40, 0, Math.PI * 2);
+            bgCtx.arc(380, 90, 35, 0, Math.PI * 2);
+            bgCtx.fill();
 
-            ctx.fillStyle = '#2d6a4f'; // Brighter green highlights
-            ctx.beginPath();
-            ctx.arc(110, 60, 35, 0, Math.PI * 2);
-            ctx.arc(220, 70, 45, 0, Math.PI * 2);
-            ctx.arc(330, 80, 40, 0, Math.PI * 2);
-            ctx.arc(450, 85, 45, 0, Math.PI * 2);
-            ctx.arc(300, 150, 25, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.fillStyle = '#2d6a4f'; // Brighter green highlights
+            bgCtx.beginPath();
+            bgCtx.arc(110, 60, 35, 0, Math.PI * 2);
+            bgCtx.arc(220, 70, 45, 0, Math.PI * 2);
+            bgCtx.arc(330, 80, 40, 0, Math.PI * 2);
+            bgCtx.arc(450, 85, 45, 0, Math.PI * 2);
+            bgCtx.arc(300, 150, 25, 0, Math.PI * 2);
+            bgCtx.fill();
 
             // 5. Update & Draw Dog (behind the grass/hill, but raised slightly to be highly visible)
             if (dogRef.current.active) {
@@ -384,6 +424,17 @@ const MorellGame = () => {
                         dog.x = targetX;
                         dog.state = 'pulling';
                         dog.timer = 6; // 0.1s at 60fps
+                        
+                        // Shout Bailey!
+                        setMissPopup({
+                            visible: true,
+                            face: Math.random() > 0.5 ? 'guy' : 'girl',
+                            text: 'Bailey!'
+                        });
+                        if (missTimeoutRef.current) clearTimeout(missTimeoutRef.current);
+                        missTimeoutRef.current = setTimeout(() => {
+                            setMissPopup(prev => ({ ...prev, visible: false }));
+                        }, 1200);
                     } else {
                         dog.x += Math.sign(diffX) * speed;
                     }
@@ -419,36 +470,36 @@ const MorellGame = () => {
                 }
 
                 // Draw Dog Emoji 🐶 (Raised slightly so it is highly visible)
-                ctx.save();
+                bgCtx.save();
                 const isFacingRight = (dog.state === 'running-in' || dog.state === 'lurking') 
                     ? (dog.side === 'left') 
                     : (dog.side === 'right');
-                ctx.font = '42px serif';
-                ctx.translate(dog.x, dog.y + 5); // Raised so it's fully visible above the hill
+                bgCtx.font = '42px serif';
+                bgCtx.translate(dog.x, dog.y + 5); // Raised so it's fully visible above the hill
                 if (!isFacingRight) {
-                    ctx.scale(-1, 1);
-                    ctx.fillText('🐶', -40, 10);
+                    bgCtx.scale(-1, 1);
+                    bgCtx.fillText('🐶', -40, 10);
                 } else {
-                    ctx.fillText('🐶', 0, 10);
+                    bgCtx.fillText('🐶', 0, 10);
                 }
 
                 // Draw warning/alert above where the dog is lurking
                 if (dog.state === 'lurking') {
-                    ctx.restore();
-                    ctx.save();
-                    ctx.font = 'bold 16px Arial';
-                    ctx.fillStyle = '#ff3333';
+                    bgCtx.restore();
+                    bgCtx.save();
+                    bgCtx.font = 'bold 16px Arial';
+                    bgCtx.fillStyle = '#ff3333';
                     const alertX = dog.side === 'left' ? 25 : 575;
                     const alertY = dog.y - 10; // Raised warning alert as well
-                    ctx.beginPath();
-                    ctx.arc(alertX, alertY, 10, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffffff';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('!', alertX, alertY);
+                    bgCtx.beginPath();
+                    bgCtx.arc(alertX, alertY, 10, 0, Math.PI * 2);
+                    bgCtx.fill();
+                    bgCtx.fillStyle = '#ffffff';
+                    bgCtx.textAlign = 'center';
+                    bgCtx.textBaseline = 'middle';
+                    bgCtx.fillText('!', alertX, alertY);
                 }
-                ctx.restore();
+                bgCtx.restore();
             } else {
                 // If dog is not active, handle random spawn
                 if (scoreRef.current >= 3) {
@@ -472,50 +523,50 @@ const MorellGame = () => {
             }
 
             // 6. Draw Grassy Hill/Knoll at the very bottom
-            let grassGrad = ctx.createLinearGradient(0, 360, 0, 400);
+            let grassGrad = bgCtx.createLinearGradient(0, 360, 0, 400);
             grassGrad.addColorStop(0, '#2d6a4f'); // orchard dark green grass
             grassGrad.addColorStop(1, '#1b3f27');
-            ctx.fillStyle = grassGrad;
-            ctx.beginPath();
-            ctx.ellipse(300, 405, 330, 45, 0, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.fillStyle = grassGrad;
+            bgCtx.beginPath();
+            bgCtx.ellipse(300, 405, 330, 45, 0, 0, Math.PI * 2);
+            bgCtx.fill();
 
             // 7. Draw left and right edge bushes (dog can hide behind them)
-            ctx.fillStyle = '#11251a';
+            bgCtx.fillStyle = '#11251a';
             // Left bush
-            ctx.beginPath();
-            ctx.arc(10, 380, 35, 0, Math.PI * 2);
-            ctx.arc(35, 395, 25, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.beginPath();
+            bgCtx.arc(10, 380, 35, 0, Math.PI * 2);
+            bgCtx.arc(35, 395, 25, 0, Math.PI * 2);
+            bgCtx.fill();
             // Right bush
-            ctx.beginPath();
-            ctx.arc(590, 380, 35, 0, Math.PI * 2);
-            ctx.arc(565, 395, 25, 0, Math.PI * 2);
-            ctx.fill();
+            bgCtx.beginPath();
+            bgCtx.arc(590, 380, 35, 0, Math.PI * 2);
+            bgCtx.arc(565, 395, 25, 0, Math.PI * 2);
+            bgCtx.fill();
 
             // 8. Draw some grass blades/sprouts on the hill
-            ctx.fillStyle = '#52b788';
-            ctx.font = '10px sans-serif';
-            ctx.fillText('🌱', 60, 375);
-            ctx.fillText('🌱', 180, 380);
-            ctx.fillText('🌱', 300, 370);
-            ctx.fillText('🌱', 420, 378);
-            ctx.fillText('🌱', 540, 372);
+            bgCtx.fillStyle = '#52b788';
+            bgCtx.font = '10px sans-serif';
+            bgCtx.fillText('🌱', 60, 375);
+            bgCtx.fillText('🌱', 180, 380);
+            bgCtx.fillText('🌱', 300, 370);
+            bgCtx.fillText('🌱', 420, 378);
+            bgCtx.fillText('🌱', 540, 372);
 
             // 9. Draw hanging cherry clusters
-            drawCherryCluster(ctx, 90, 70);
-            drawCherryCluster(ctx, 160, 85);
-            drawCherryCluster(ctx, 220, 105);
-            drawCherryCluster(ctx, 270, 245);
-            drawCherryCluster(ctx, 320, 155);
-            drawCherryCluster(ctx, 350, 100);
-            drawCherryCluster(ctx, 410, 120);
-            drawCherryCluster(ctx, 480, 110);
-            drawCherryCluster(ctx, 530, 95);
+            drawCherryCluster(bgCtx, 90, 70);
+            drawCherryCluster(bgCtx, 160, 85);
+            drawCherryCluster(bgCtx, 220, 105);
+            drawCherryCluster(bgCtx, 270, 245);
+            drawCherryCluster(bgCtx, 320, 155);
+            drawCherryCluster(bgCtx, 350, 100);
+            drawCherryCluster(bgCtx, 410, 120);
+            drawCherryCluster(bgCtx, 480, 110);
+            drawCherryCluster(bgCtx, 530, 95);
 
             // Draw Basket (basket emoji 🧺)
-            ctx.font = '50px serif';
-            ctx.fillText('🧺', basketRef.current.x, basketRef.current.y + 38);
+            fgCtx.font = '50px serif';
+            fgCtx.fillText('🧺', basketRef.current.x, basketRef.current.y + 38);
 
             // Move Basket via keys
             const basketSpeed = 8;
@@ -555,8 +606,8 @@ const MorellGame = () => {
                 cherry.y += cherry.speed;
 
                 // Draw Cherry emoji 🍒
-                ctx.font = '24px serif';
-                ctx.fillText('🍒', cherry.x - 12, cherry.y + 8);
+                fgCtx.font = '24px serif';
+                fgCtx.fillText('🍒', cherry.x - 12, cherry.y + 8);
 
                 // Collision Detection with Basket
                 const basket = basketRef.current;
@@ -568,8 +619,16 @@ const MorellGame = () => {
                     scoreRef.current += 1;
                     setScore(scoreRef.current);
                     cherriesRef.current.splice(i, 1);
-                    if (scoreRef.current === 10) {
-                        triggerSuccessPopup();
+
+                    // Extra life for every 5th cherry caught
+                    if (scoreRef.current % 5 === 0) {
+                        livesRef.current += 1;
+                        setLives(livesRef.current);
+                    }
+
+                    // Success popup at multiples of 10
+                    if (scoreRef.current % 10 === 0 && scoreRef.current > 0) {
+                        triggerSuccessPopup(scoreRef.current);
                     }
                     continue;
                 }
@@ -590,10 +649,10 @@ const MorellGame = () => {
             }
 
             // HUD
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '16px "Quicksand", sans-serif';
-            ctx.fillText(`Poeng: ${scoreRef.current}`, 20, 30);
-            ctx.fillText(`Liv: ${'❤️'.repeat(livesRef.current)}`, 500, 30);
+            fgCtx.fillStyle = '#ffffff';
+            fgCtx.font = '16px "Quicksand", sans-serif';
+            fgCtx.fillText(`Poeng: ${scoreRef.current}`, 20, 30);
+            fgCtx.fillText(`Liv: ${'❤️'.repeat(livesRef.current)}`, 500, 30);
 
             if (livesRef.current > 0) {
                 animationFrameId.current = requestAnimationFrame(updateAndRender);
@@ -650,13 +709,24 @@ const MorellGame = () => {
                     box-shadow: 0 8px 30px rgba(0,0,0,0.15);
                     background-color: #1e382b;
                 }
-                .game-canvas {
+                .game-canvas-bg {
                     display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1;
+                }
+                .game-canvas-fg {
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
                     width: 100%;
                     height: 100%;
                     cursor: none;
-                    position: relative;
-                    z-index: 2;
+                    z-index: 3;
                     background: transparent;
                 }
                 .game-overlay {
@@ -748,9 +818,9 @@ const MorellGame = () => {
                     display: flex;
                     align-items: center;
                     gap: 12px;
-                    z-index: 1;
+                    z-index: 2;
                     pointer-events: none;
-                    opacity: 0.85; /* Faded but slightly higher opacity since it renders behind the canvas */
+                    opacity: 1;
                 }
                 .miss-left {
                     bottom: 20px;
@@ -792,36 +862,57 @@ const MorellGame = () => {
                 }
                 .speech-bubble {
                     background-color: #ffffff;
-                    color: #333333;
+                    color: #1a1a1a;
+                    border: 2px solid var(--gold, #c5a059);
                     border-radius: 12px;
-                    padding: 10px 15px;
+                    padding: 10px 14px;
                     font-size: 0.95rem;
                     font-weight: bold;
                     position: relative;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
                     max-width: 180px;
                     line-height: 1.4;
                     text-align: left;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
                 }
-                .left-arrow::before {
+                .speech-bubble.left-arrow::before {
                     content: '';
                     position: absolute;
+                    top: 50%;
                     left: -8px;
-                    top: 50%;
                     transform: translateY(-50%);
-                    border-top: 8px solid transparent;
-                    border-bottom: 8px solid transparent;
-                    border-right: 8px solid #ffffff;
+                    border-width: 8px 8px 8px 0;
+                    border-style: solid;
+                    border-color: transparent var(--gold, #c5a059) transparent transparent;
                 }
-                .right-arrow::before {
+                .speech-bubble.left-arrow::after {
                     content: '';
                     position: absolute;
-                    right: -8px;
                     top: 50%;
+                    left: -5px;
                     transform: translateY(-50%);
-                    border-top: 8px solid transparent;
-                    border-bottom: 8px solid transparent;
-                    border-left: 8px solid #ffffff;
+                    border-width: 7px 7px 7px 0;
+                    border-style: solid;
+                    border-color: transparent #ffffff transparent transparent;
+                }
+                .speech-bubble.right-arrow::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    right: -8px;
+                    transform: translateY(-50%);
+                    border-width: 8px 0 8px 8px;
+                    border-style: solid;
+                    border-color: transparent transparent transparent var(--gold, #c5a059);
+                }
+                .speech-bubble.right-arrow::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    right: -5px;
+                    transform: translateY(-50%);
+                    border-width: 7px 0 7px 7px;
+                    border-style: solid;
+                    border-color: transparent transparent transparent #ffffff;
                 }
                 .animate-pop {
                     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -847,10 +938,16 @@ const MorellGame = () => {
 
                 <div className="game-canvas-wrapper" ref={gameAreaRef}>
                     <canvas
+                        ref={bgCanvasRef}
+                        width={600}
+                        height={400}
+                        className="game-canvas-bg"
+                    />
+                    <canvas
                         ref={canvasRef}
                         width={600}
                         height={400}
-                        className="game-canvas"
+                        className="game-canvas-fg"
                         onMouseMove={handleMouseMove}
                         onTouchMove={handleTouchMove}
                     />
@@ -961,7 +1058,7 @@ const MorellGame = () => {
                     </table>
                 )}
 
-                <button className="btn-outline" style={{ marginTop: '30px', padding: '10px 25px', fontSize: '0.9rem' }} onClick={() => setIsExpanded(false)}>
+                <button className="btn-outline" style={{ marginTop: '30px', padding: '10px 25px', fontSize: '0.9rem' }} onClick={() => { setIsExpanded(false); setIsPlaying(false); }}>
                     Skjul spill
                 </button>
             </div>

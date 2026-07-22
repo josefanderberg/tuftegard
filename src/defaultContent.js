@@ -3,7 +3,13 @@ export const defaultContent = {
         subtitle: "",
         title: "Midt i morellhagen",
         description: "Velkommen til Tufte Gård – en familiedrevet morellgård og gårdskafé i Telemark.",
-        buttonText: "Opplev Sesongens Tilbud"
+        buttonText: "Opplev Sesongens Tilbud",
+        openingHoursTitle: "Åpningstider i juli",
+        openingHours: [
+            "Tirsdag–Torsdag: 12–19",
+            "Fredag–Lørdag: 12–22",
+            "Søndag: 12–18"
+        ]
     },
     intro: {
         label: "Tufte Gård",
@@ -86,49 +92,65 @@ export const defaultContent = {
             {
                 title: "Focaccia",
                 price: "139,-",
-                description: "Speke, mozzarella, pesto, tomat (GH, M, SV, SEN) / Porchetta, bakt hvitløk, chimmichurri, sylta rødløk (GH, SEN, SV, E)",
+                description: "• Speke, mozzarella, pesto, tomat\n• Porchetta, bakt hvitløk, chimmichurri, sylta rødløk",
+                allergens: ['GH', 'M', 'E', 'SEN', 'SV'],
+                variantAllergens: [
+                    ['GH', 'M', 'SEN', 'SV'],
+                    ['GH', 'E', 'SEN', 'SV']
+                ],
                 category: "mat"
             },
             {
                 title: "Langos",
                 price: "169,-",
-                description: "Skagenrøre, rødløk, dill, rogn (GH, SK, F, SEN, SV) / Speke, urtekremost, rødløk, sylta chili (GH, M, SV)",
+                description: "• Skagenrøre, rødløk, dill, rogn\n• Speke, urtekremost, rødløk, sylta chili",
+                allergens: ['GH', 'SK', 'F', 'E', 'M', 'SEN', 'SV'],
+                variantAllergens: [
+                    ['GH', 'SK', 'F', 'E', 'SEN', 'SV'],
+                    ['GH', 'M', 'SV']
+                ],
                 category: "mat"
             },
             {
                 title: "Smørgåstårta",
                 price: "199,-",
-                description: "(GH, M, F, SK, SV, SEN)",
+                description: "En svensk klassiker med lag av mykt brød, kremet fyll og friske smaker",
+                allergens: ['GH', 'M', 'F', 'SK', 'E', 'SEN', 'SV'],
                 category: "mat"
             },
             {
                 title: "Krokett",
                 price: "95,-",
-                description: "Ølkokt svinekjake m/grilla paprikamajones (GH, E, SV, SEN)",
+                description: "Ølkokt svinekjake m/grilla paprikamajones",
+                allergens: ['GH', 'E', 'SEN', 'SV'],
                 category: "maevl"
             },
             {
                 title: "Fritert brie",
                 price: "85,-",
-                description: "(Tuftes chili cheese) m/ripssyltetøy og sylta chili (GH, M, SV)",
+                description: "(Tuftes chili cheese) m/ripssyltetøy og sylta chili",
+                allergens: ['GH', 'M', 'SV'],
                 category: "maevl"
             },
             {
                 title: "Lammeribbe",
                 price: "105,-",
-                description: "m/glaze og jalapenomayo (SO, E, SV, SES, SEN)",
+                description: "m/glaze og jalapenomayo",
+                allergens: ['SO', 'E', 'SES', 'SEN', 'SV'],
                 category: "maevl"
             },
             {
                 title: "Potetgull",
                 price: "115,-",
-                description: "m/rogn, rømme, rødløk og dill (F, M)",
+                description: "m/rogn, rømme, rødløk og dill",
+                allergens: ['F', 'M'],
                 category: "maevl"
             },
             {
                 title: "Pommes Frites",
                 price: "65,-",
-                description: "m/aioli (E, SV, SEN)",
+                description: "m/aioli",
+                allergens: ['E', 'SEN', 'SV'],
                 category: "maevl"
             }
         ],
@@ -189,7 +211,7 @@ export const defaultContent = {
         message2: "Du vil høyre frå oss på SMS så snart me har bekrefta bordet."
     },
     footer: {
-        text: "Tufte Gård © 2026 | Midt i morellhagen"
+        text: "Tufte Gård © 2025 | Kaféen på Fen"
     },
     calendar: {
         openDates: [
