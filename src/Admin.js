@@ -1069,6 +1069,7 @@ const Admin = ({ content, onSave }) => {
                                 <Input label="Datum (t.ex. '15 Juni' eller '15. Juni')" value={event.date} onChange={(e) => handleObjectArrayChange('events', null, i, 'date', e.target.value)} />
                             </div>
                             <TextArea label="Beskrivning" value={event.description} onChange={(e) => handleObjectArrayChange('events', null, i, 'description', e.target.value)} />
+                            <Input label="Framhävd rad (svart text längst ner, t.ex. 'Inngang: 150 kr' — lämna tom för ingen)" value={event.highlight || ''} onChange={(e) => handleObjectArrayChange('events', null, i, 'highlight', e.target.value)} />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
                                 <Input label="Bokningsdatum (YYYY-MM-DD)" value={event.bookingDate} onChange={(e) => handleObjectArrayChange('events', null, i, 'bookingDate', e.target.value)} />
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1088,7 +1089,7 @@ const Admin = ({ content, onSave }) => {
                     ))}
 
                     <button
-                        onClick={() => handleAddItem('events', null, { title: 'Nytt Event', date: '', description: '', bookingDate: '', imageUrl: '' })}
+                        onClick={() => handleAddItem('events', null, { title: 'Nytt Event', date: '', description: '', highlight: '', bookingDate: '', imageUrl: '' })}
                         style={{ padding: '10px 20px', background: '#4caf50', color: '#fff', border: 'none', borderRadius: '2px', cursor: 'pointer', marginBottom: '30px' }}
                     >
                         + Lägg till Nytt Event

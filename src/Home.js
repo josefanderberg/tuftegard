@@ -484,10 +484,9 @@ const Home = ({ content: propContent }) => {
                                         </div>
                                         <h4>{event.title}</h4>
                                         <p>{event.description}</p>
-                                        
-                                        <h4>
-                                            Bestill på: 46824498
-                                        </h4>
+                                        {event.highlight && (
+                                            <h4 className="event-highlight">{event.highlight}</h4>
+                                        )}
                                     </RevealOnScroll>
                                 );
                             })}

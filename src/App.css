@@ -1185,7 +1185,15 @@ button {
 .event-card p {
   color: #666;
   font-size: 1rem;
+  line-height: 1.8;
+  white-space: pre-line;
   margin-bottom: 25px;
+}
+
+.event-card .event-highlight {
+  font-size: 1.1rem;
+  color: var(--primary-dark);
+  margin-bottom: 0;
 }
 
 .btn-event {
