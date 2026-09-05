@@ -42,30 +42,6 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     );
 };
 
-const getDynamicOpeningHoursTitle = (title) => {
-    if (!title) return "";
-    const monthsNO = ["januar", "februar", "mars", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "desember"];
-    const monthsSV = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
-    
-    const currentMonthIndex = new Date().getMonth();
-    const currentMonthNO = monthsNO[currentMonthIndex];
-    const currentMonthSV = monthsSV[currentMonthIndex];
-    
-    // Match any Norwegian/Swedish month name (case-insensitive)
-    const monthRegex = /(januar[i]?|februar[i]?|mars|april|ma[ij]|juni|juli|august[i]?|september|oktober|november|de[cs]ember)/gi;
-    
-    return title.replace(monthRegex, (match) => {
-        const isSwedish = match.toLowerCase().endsWith('i') || match.toLowerCase() === 'maj' || match.toLowerCase() === 'december';
-        const isCapitalized = match[0] === match[0].toUpperCase();
-        
-        let replacement = isSwedish ? currentMonthSV : currentMonthNO;
-        if (isCapitalized) {
-            replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
-        }
-        return replacement;
-    });
-};
-
 const Home = ({ content: propContent }) => {
     // ... (rest of imports/state) ...
 
@@ -398,14 +374,6 @@ const Home = ({ content: propContent }) => {
                     <button className="btn-primary" onClick={() => scrollToSection('meny', 70)}>{content.hero.buttonText || "Opplev Sesongens Tilbud"}</button>
                 </div>
 
-                <div className="hero-opening-hours">
-                    <span className="opening-hours-title">{getDynamicOpeningHoursTitle(content.hero.openingHoursTitle)}</span>
-                    <div className="opening-hours-list">
-                        {(content.hero.openingHours || []).map((line, i) => (
-                            <div key={i}>{line}</div>
-                        ))}
-                    </div>
-                </div>
             </section>
 
 
