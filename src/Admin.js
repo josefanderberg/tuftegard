@@ -842,7 +842,7 @@ const Admin = ({ content, onSave }) => {
                             <Input label="Knapp" value={formData.hero?.buttonText} onChange={(e) => handleChange('hero', 'buttonText', e.target.value)} />
 
                             <h4 style={{ marginTop: '20px', color: '#c5a059' }}>🕒 Åpningstider (visas högst upp på sidan)</h4>
-                            <Input label="Rubrik (Månedens navn oppdateres automatisk, f.eks. 'Åpningstider i juni')" value={formData.hero?.openingHoursTitle} onChange={(e) => handleChange('hero', 'openingHoursTitle', e.target.value)} />
+                            <Input label="Rubrik (Skriv du én måned, f.eks. 'Åpningstider i juni', oppdateres navnet automatisk. Skriver du en periode, f.eks. 'Åpningstider i september og oktober', står teksten som den er.)" value={formData.hero?.openingHoursTitle} onChange={(e) => handleChange('hero', 'openingHoursTitle', e.target.value)} />
                             <label style={{ display: 'block', fontSize: '0.8rem', color: '#aaa', marginBottom: '5px' }}>Rader (en per dag/tidsintervall)</label>
                             {formData.hero?.openingHours?.map((line, i) => (
                                 <div key={i} style={{ marginBottom: '5px', display: 'flex' }}>
@@ -855,6 +855,9 @@ const Admin = ({ content, onSave }) => {
                                 </div>
                             ))}
                             <button onClick={() => handleAddItem('hero', 'openingHours', 'Måndag–Fredag: 12–19')} style={{ fontSize: '0.8rem' }}>+ Rad</button>
+                            <div style={{ marginTop: '15px' }}>
+                                <Input label="Notis under tiderna (t.ex. 'Siste dag i sommersesongen: 14. august')" value={formData.hero?.openingHoursNote} onChange={(e) => handleChange('hero', 'openingHoursNote', e.target.value)} />
+                            </div>
                         </div>
 
                         <div className="group-box">

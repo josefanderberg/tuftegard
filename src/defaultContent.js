@@ -6,10 +6,11 @@ export const defaultContent = {
         buttonText: "Opplev Sesongens Tilbud",
         openingHoursTitle: "Åpningstider i juli",
         openingHours: [
-            "Tirsdag–Torsdag: 12–19",
+            "Onsdag–Torsdag: 12–19",
             "Fredag–Lørdag: 12–22",
             "Søndag: 12–18"
-        ]
+        ],
+        openingHoursNote: "Siste dag i sommersesongen: 14. august"
     },
     intro: {
         label: "Tufte Gård",
@@ -61,23 +62,23 @@ export const defaultContent = {
     gallery: {
         title: "Glimt fra gården",
         images: [
-            { url: '/tufte18.png', category: 'vinter' },
-            { url: '/tufte19.png', category: 'vinter' },
-            { url: '/tufte20.png', category: 'sommar' },
-            { url: '/tufte6.png', category: 'sommar' },
-            { url: '/tufte1.png', category: 'sommar' },
-            { url: '/tufte8.png', category: 'vinter' },
-            { url: '/tufte9.png', category: 'sommar' },
-            { url: '/tufte10.png', category: 'sommar' },
-            { url: '/tufte11.png', category: 'vinter' },
-            { url: '/tufte12.png', category: 'sommar' },
-            { url: '/tufte14.png', category: 'sommar' },
-            { url: '/tufte15.png', category: 'sommar' },
-            { url: '/tufte16.png', category: 'sommar' },
-            { url: '/tufte17.png', category: 'sommar' },
-            { url: '/tufte13.png', category: 'sommar' },
-            { url: '/tufte21.png', category: 'sommar' },
-            { url: '/tufte22.png', category: 'sommar' }
+            { url: '/tufte18.png', category: 'vinter', alt: 'Gjester samlet rundt bålpannene en vinterkveld på Tufte Gård' },
+            { url: '/tufte19.png', category: 'vinter', alt: 'Vinterkveld på terrassen med bålpanner og lysslynger på gårdskafeen Tufte Gård' },
+            { url: '/tufte20.png', category: 'sommar', alt: 'Gjester spiser middag rundt bålpanna på Tufte Gård i Ulefoss' },
+            { url: '/tufte6.png', category: 'sommar', alt: 'Uteservering med parasoller og bålpannebord på plattingen på Tufte Gård' },
+            { url: '/tufte1.png', category: 'sommar', alt: 'Vert bak baren mens gjester koser seg rundt bålpannene på Tufte Gård' },
+            { url: '/tufte8.png', category: 'vinter', alt: 'Uteplass med parasoller rett ved morellhagen på Tufte Gård' },
+            { url: '/tufte9.png', category: 'sommar', alt: 'Gårdskafeen på Tufte Gård med disk, menytavle og koselige sittegrupper' },
+            { url: '/tufte10.png', category: 'sommar', alt: 'Corgivalp på terrassen ved morellhagen på Tufte Gård' },
+            { url: '/tufte11.png', category: 'vinter', alt: 'Betjeningen ønsker velkommen ved kafédisken på Tufte Gård' },
+            { url: '/tufte12.png', category: 'sommar', alt: 'Menytavle med focaccia, langos og smørgåstårta i gårdskafeen på Tufte Gård' },
+            { url: '/tufte14.png', category: 'sommar', alt: 'Smørgåstårta med reker, røkelaks og norske flagg i morellhagen på Tufte Gård' },
+            { url: '/tufte15.png', category: 'sommar', alt: 'Nyplukkede moreller fra egen hage i gårdsutsalget på Tufte Gård i Telemark' },
+            { url: '/tufte16.png', category: 'sommar', alt: 'Hjemmelaget kake med mandler servert på terrassen ved morellhagen' },
+            { url: '/tufte17.png', category: 'sommar', alt: 'Focaccia med chips og lokal eplemost servert i gårdskafeen på Tufte Gård' },
+            { url: '/tufte13.png', category: 'sommar', alt: 'Familien bak Tufte Gård samlet ved kafédisken' },
+            { url: '/tufte21.png', category: 'sommar', alt: 'Grilling på gårdstunet på Tufte Gård' },
+            { url: '/tufte22.png', category: 'sommar', alt: 'Svele med friske bær, krem og bringebærlemonade på Tufte Gård' }
 
         ]
     },

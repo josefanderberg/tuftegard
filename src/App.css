@@ -91,6 +91,8 @@ button {
 
 .nav-menu {
   display: flex;
+  /* Utan denna sträcks länkarna ut till knappens höjd och texten hamnar högre upp */
+  align-items: center;
   gap: 30px;
 }
 
@@ -154,6 +156,7 @@ button {
     width: 100%;
     background-color: var(--primary-dark);
     flex-direction: column;
+    align-items: stretch;
 
     /* ÄNDRING 1: Sätt padding till 0 här */
     padding: 0;
@@ -250,6 +253,14 @@ button {
   color: #ffffff;
   line-height: 1.6;
   font-weight: 500;
+}
+
+.opening-hours-note {
+  margin-top: 8px;
+  font-size: var(--fs-xs);
+  color: var(--gold);
+  font-style: italic;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {

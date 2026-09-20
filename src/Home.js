@@ -15,8 +15,15 @@ import MorellGame from './MorellGame';
 
 registerLocale('nb', nb);
 
+// Alt-tekster for galleribilder (brukes også når bildelista kommer fra Firestore uten alt)
+const galleryAltByUrl = Object.fromEntries(
+    (defaultContent.gallery?.images || [])
+        .filter(img => img.alt)
+        .map(img => [img.url, img.alt])
+);
+
 // --- ANIMATION KOMPONENT ---
-const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
+const RevealOnScroll = ({ children, id, className = "", style = {}, ...rest }) => {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef(null);
 
@@ -36,7 +43,7 @@ const RevealOnScroll = ({ children, id, className = "", style = {} }) => {
     }, []);
 
     return (
-        <div ref={ref} id={id} className={`reveal-section ${isVisible ? 'is-visible' : ''} ${className}`} style={style}>
+        <div ref={ref} id={id} className={`reveal-section ${isVisible ? 'is-visible' : ''} ${className}`} style={style} {...rest}>
             {children}
         </div>
     );
@@ -46,14 +53,20 @@ const getDynamicOpeningHoursTitle = (title) => {
     if (!title) return "";
     const monthsNO = ["januar", "februar", "mars", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "desember"];
     const monthsSV = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
-    
+
+    // Match any Norwegian/Swedish month name (case-insensitive)
+    const monthRegex = /(januar[i]?|februar[i]?|mars|april|ma[ij]|juni|juli|august[i]?|september|oktober|november|de[cs]ember)/gi;
+
+    // Nevner tittelen flere måneder (f.eks. "Åpningstider i september og oktober"),
+    // er perioden skrevet med vilje – da lar vi teksten stå som den er.
+    // Ellers ville alle månedene blitt byttet til samme navn.
+    const months = title.match(monthRegex) || [];
+    if (months.length !== 1) return title;
+
     const currentMonthIndex = new Date().getMonth();
     const currentMonthNO = monthsNO[currentMonthIndex];
     const currentMonthSV = monthsSV[currentMonthIndex];
-    
-    // Match any Norwegian/Swedish month name (case-insensitive)
-    const monthRegex = /(januar[i]?|februar[i]?|mars|april|ma[ij]|juni|juli|august[i]?|september|oktober|november|de[cs]ember)/gi;
-    
+
     return title.replace(monthRegex, (match) => {
         const isSwedish = match.toLowerCase().endsWith('i') || match.toLowerCase() === 'maj' || match.toLowerCase() === 'december';
         const isCapitalized = match[0] === match[0].toUpperCase();
@@ -376,7 +389,7 @@ const Home = ({ content: propContent }) => {
 
             <header className={`header ${scrolled ? 'scrolled' : ''}`}>
                 <div className="header-container">
-                    <img src="/logo.png" alt="Tufte Gård" className="logo" onClick={() => scrollToSection('hjem')} />
+                    <img src="/logo.png" alt="Tufte Gård – morellgård og gårdskafé i Telemark" className="logo" onClick={() => scrollToSection('hjem')} />
                     <button className={`menu-toggle ${menuOpen ? 'active' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
                         <span className="bar"></span><span className="bar"></span><span className="bar"></span>
                     </button>
@@ -405,6 +418,9 @@ const Home = ({ content: propContent }) => {
                             <div key={i}>{line}</div>
                         ))}
                     </div>
+                    {content.hero.openingHoursNote && (
+                        <div className="opening-hours-note">{content.hero.openingHoursNote}</div>
+                    )}
                 </div>
             </section>
 
@@ -423,7 +439,7 @@ const Home = ({ content: propContent }) => {
             {/* --- SEKTION 2: GARDEN (Bild Vänster / Text Höger) --- */}
             <div className="split-section">
                 <div className="split-section-inner">
-                    <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte8.png')" }}>
+                    <RevealOnScroll className="split-image slide-left" style={{ backgroundImage: "url('/tufte8.png')" }} role="img" aria-label="Uteplass med parasoller ved morellhagen på Tufte Gård">
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-right">
@@ -436,7 +452,7 @@ const Home = ({ content: propContent }) => {
             {/* --- SEKTION 3: MATEN (Bild Höger / Text Vänster) --- */}
             <div className="split-section">
                 <div className="split-section-inner reverse">
-                    <RevealOnScroll className="split-image slide-right" style={{ backgroundImage: "url('/tufte11.png')" }}>
+                    <RevealOnScroll className="split-image slide-right" style={{ backgroundImage: "url('/tufte11.png')" }} role="img" aria-label="Betjeningen ved kafédisken på Tufte Gård">
                         {/* Bild Container */}
                     </RevealOnScroll>
                     <RevealOnScroll className="split-content slide-left">
@@ -565,7 +581,7 @@ const Home = ({ content: propContent }) => {
                 <div className="masonry-grid">
                     {displayedGalleryImages.slice(0, visibleImagesCount).map((imgObj, index) => (
                         <div key={index} className="masonry-item">
-                            <img src={imgObj.url} alt={`Tufte Gård ${imgObj.category || 'stemning'} bild ${index + 1}`} loading="lazy" />
+                            <img src={imgObj.url} alt={imgObj.alt || galleryAltByUrl[imgObj.url] || `Tufte Gård – ${imgObj.category === 'vinter' ? 'vinterstemning rundt bålpanna' : 'sommerstemning i morellhagen'}`} loading="lazy" />
                         </div>
                     ))}
                 </div>

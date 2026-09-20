@@ -620,12 +620,6 @@ const MorellGame = () => {
                     setScore(scoreRef.current);
                     cherriesRef.current.splice(i, 1);
 
-                    // Extra life for every 5th cherry caught
-                    if (scoreRef.current % 5 === 0) {
-                        livesRef.current += 1;
-                        setLives(livesRef.current);
-                    }
-
                     // Success popup at multiples of 10
                     if (scoreRef.current % 10 === 0 && scoreRef.current > 0) {
                         triggerSuccessPopup(scoreRef.current);
@@ -956,10 +950,10 @@ const MorellGame = () => {
                     {isPlaying && missPopup.visible && (
                         <div className="game-comment-popup miss-left animate-pop">
                             <div className="avatar-circle">
-                                <img 
-                                    src="/people.jpg" 
-                                    alt="Face" 
-                                    className={`avatar-img ${missPopup.face === 'guy' ? 'crop-guy' : 'crop-girl'}`} 
+                                <img
+                                    src="/people.jpg"
+                                    alt="Face"
+                                    className={`avatar-img ${missPopup.face === 'guy' ? 'crop-guy' : 'crop-girl'}`}
                                 />
                             </div>
                             <div className="speech-bubble left-arrow">
@@ -975,10 +969,10 @@ const MorellGame = () => {
                                 {successPopup.text}
                             </div>
                             <div className="avatar-circle">
-                                <img 
-                                    src="/glenn.jpg" 
-                                    alt="Glenn" 
-                                    className="avatar-img crop-glenn" 
+                                <img
+                                    src="/glenn.jpg"
+                                    alt="Glenn"
+                                    className="avatar-img crop-glenn"
                                 />
                             </div>
                         </div>
@@ -1019,7 +1013,7 @@ const MorellGame = () => {
                                     <h4 className="game-title">Morellfangst</h4>
                                     <p className="game-instructions">
                                         Flytt korgen 🧺 for å fange de fallende morellene 🍒. <br />
-                                        Du mister et liv ❤️ om de treffer bakken. Spillet blir raskere etter hvert!
+                                        Du starter med 3 liv ❤️ og mister ett hver gang en morell treffer bakken. Spillet blir raskere etter hvert!
                                     </p>
                                     <button className="btn-primary" onClick={startGame}>Start Spill</button>
                                 </>
