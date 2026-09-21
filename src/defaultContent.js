@@ -84,80 +84,130 @@ export const defaultContent = {
     },
     menu: {
         label: "Kafé & Gårdsutsalg",
-        title: "Sommermeny",
-        intro: "Velkommen til en smak av sommer på Tufte Gård! Vi serverer deilige, friske retter laget med kjærlighet.",
+        title: "Høstmeny",
+        intro: "Velkommen til en smak av høst på Tufte Gård! Vi serverer varme, gode retter laget med kjærlighet og sesongens beste råvarer.",
         priceNote: "",
         priceNotePrefix: "",
         openingTimes: [],
         mainCourses: [
             {
-                title: "Focaccia",
-                price: "139,-",
-                description: "• Speke, mozzarella, pesto, tomat\n• Porchetta, bakt hvitløk, chimmichurri, sylta rødløk",
-                allergens: ['GH', 'M', 'E', 'SEN', 'SV'],
-                variantAllergens: [
-                    ['GH', 'M', 'SEN', 'SV'],
-                    ['GH', 'E', 'SEN', 'SV']
-                ],
+                title: "Gulasj",
+                price: "229,-",
+                description: "Med chorizo, høyrygg, paprika, potet og rømme",
                 category: "mat"
             },
             {
-                title: "Langos",
-                price: "169,-",
-                description: "• Skagenrøre, rødløk, dill, rogn\n• Speke, urtekremost, rødløk, sylta chili",
-                allergens: ['GH', 'SK', 'F', 'E', 'M', 'SEN', 'SV'],
-                variantAllergens: [
-                    ['GH', 'SK', 'F', 'E', 'SEN', 'SV'],
-                    ['GH', 'M', 'SV']
-                ],
-                category: "mat"
-            },
-            {
-                title: "Smørgåstårta",
+                title: "Bakt potet",
                 price: "199,-",
-                description: "En svensk klassiker med lag av mykt brød, kremet fyll og friske smaker",
-                allergens: ['GH', 'M', 'F', 'SK', 'E', 'SEN', 'SV'],
+                description: "Med revet fe, chipotle, røkt rømme, vårløk, mais og syltet jalapeño",
                 category: "mat"
             },
             {
-                title: "Krokett",
+                title: "Focaccia",
+                price: "159,-",
+                description: "Med tryffelsalami, sopp, karamellisert løk og västerbottenost",
+                category: "mat"
+            },
+            {
+                title: "Spicy maisribs",
                 price: "95,-",
-                description: "Ølkokt svinekjake m/grilla paprikamajones",
-                allergens: ['GH', 'E', 'SEN', 'SV'],
+                description: "m/gressløkmayo og gresskarkjerner",
                 category: "maevl"
             },
             {
                 title: "Fritert brie",
-                price: "85,-",
-                description: "(Tuftes chili cheese) m/ripssyltetøy og sylta chili",
-                allergens: ['GH', 'M', 'SV'],
-                category: "maevl"
-            },
-            {
-                title: "Lammeribbe",
                 price: "105,-",
-                description: "m/glaze og jalapenomayo",
-                allergens: ['SO', 'E', 'SES', 'SEN', 'SV'],
+                description: "m/multesyltetøy",
                 category: "maevl"
             },
             {
-                title: "Potetgull",
-                price: "115,-",
-                description: "m/rogn, rømme, rødløk og dill",
-                allergens: ['F', 'M'],
+                title: "Pommes frites",
+                price: "69,-",
+                description: "m/steinsoppmajones",
                 category: "maevl"
             },
             {
-                title: "Pommes Frites",
-                price: "65,-",
-                description: "m/aioli",
-                allergens: ['E', 'SEN', 'SV'],
+                title: "Potetgull med smak av høst",
+                price: "119,-",
+                description: "Steinsoppmajones, västerbottenost, tryffelsalami, syltet løk og gressløk",
                 category: "maevl"
             }
         ],
         drinksGroups: []
     },
     archivedMenus: {
+        summer: {
+            label: "Kafé & Gårdsutsalg",
+            title: "Sommermeny",
+            intro: "Velkommen til en smak av sommer på Tufte Gård! Vi serverer deilige, friske retter laget med kjærlighet.",
+            mainCourses: [
+                {
+                    title: "Focaccia",
+                    price: "139,-",
+                    description: "• Speke, mozzarella, pesto, tomat\n• Porchetta, bakt hvitløk, chimmichurri, sylta rødløk",
+                    allergens: ['GH', 'M', 'E', 'SEN', 'SV'],
+                    variantAllergens: [
+                        ['GH', 'M', 'SEN', 'SV'],
+                        ['GH', 'E', 'SEN', 'SV']
+                    ],
+                    category: "mat"
+                },
+                {
+                    title: "Langos",
+                    price: "169,-",
+                    description: "• Skagenrøre, rødløk, dill, rogn\n• Speke, urtekremost, rødløk, sylta chili",
+                    allergens: ['GH', 'SK', 'F', 'E', 'M', 'SEN', 'SV'],
+                    variantAllergens: [
+                        ['GH', 'SK', 'F', 'E', 'SEN', 'SV'],
+                        ['GH', 'M', 'SV']
+                    ],
+                    category: "mat"
+                },
+                {
+                    title: "Smørgåstårta",
+                    price: "199,-",
+                    description: "En svensk klassiker med lag av mykt brød, kremet fyll og friske smaker",
+                    allergens: ['GH', 'M', 'F', 'SK', 'E', 'SEN', 'SV'],
+                    category: "mat"
+                },
+                {
+                    title: "Krokett",
+                    price: "95,-",
+                    description: "Ølkokt svinekjake m/grilla paprikamajones",
+                    allergens: ['GH', 'E', 'SEN', 'SV'],
+                    category: "maevl"
+                },
+                {
+                    title: "Fritert brie",
+                    price: "85,-",
+                    description: "(Tuftes chili cheese) m/ripssyltetøy og sylta chili",
+                    allergens: ['GH', 'M', 'SV'],
+                    category: "maevl"
+                },
+                {
+                    title: "Lammeribbe",
+                    price: "105,-",
+                    description: "m/glaze og jalapenomayo",
+                    allergens: ['SO', 'E', 'SES', 'SEN', 'SV'],
+                    category: "maevl"
+                },
+                {
+                    title: "Potetgull",
+                    price: "115,-",
+                    description: "m/rogn, rømme, rødløk og dill",
+                    allergens: ['F', 'M'],
+                    category: "maevl"
+                },
+                {
+                    title: "Pommes Frites",
+                    price: "65,-",
+                    description: "m/aioli",
+                    allergens: ['E', 'SEN', 'SV'],
+                    category: "maevl"
+                }
+            ],
+            drinksGroups: []
+        },
         winter: {
             label: "Sesongens Oppleving",
             title: "Vintermeny: Rundt Bålet",
